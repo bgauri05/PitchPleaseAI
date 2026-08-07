@@ -1,48 +1,40 @@
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'motion/react';
-import { ArrowRight, CheckCircle, Sparkles, TrendingUp, Users, Globe, MessageSquare, Calendar, Instagram, Linkedin, Mail, Facebook, Youtube, Play, Zap, Target, BarChart3 } from 'lucide-react';
+import { 
+  ArrowRight, Sparkles, CheckCircle2, XCircle, RefreshCw, 
+  Linkedin, Twitter, Instagram, Play, Bot, Database, CalendarDays,
+  ShieldCheck, HelpCircle
+} from 'lucide-react';
 import { Link } from 'react-router';
 import { Logo } from '../components/Logo';
-import { FloatingPreviewCards } from '../components/FloatingPreviewCards';
+import { CapabilityBar } from '../components/CapabilityBar';
+import { FeatureSliderSection } from '../components/FeatureSliderSection';
+import { FeedbackBentoSection } from '../components/FeedbackBentoSection';
+import { CarBicycleVisual } from '../components/CarBicycleVisual';
+import { BrandJourneyMap } from '../components/BrandJourneyMap';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '../components/ui/accordion';
 import { useRef, useState, useEffect } from 'react';
 
 export function LandingPage() {
   const { scrollY } = useScroll();
   const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
   const heroScale = useTransform(scrollY, [0, 300], [1, 0.95]);
-  
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  const platforms = [
-    { name: 'Instagram', icon: Instagram, color: 'from-pink-500 to-purple-500', hoverGlow: 'rgba(236, 72, 153, 0.4)' },
-    { name: 'WhatsApp', icon: MessageSquare, color: 'from-green-500 to-emerald-400', hoverGlow: 'rgba(34, 197, 94, 0.4)' },
-    { name: 'LinkedIn', icon: Linkedin, color: 'from-blue-600 to-blue-400', hoverGlow: 'rgba(37, 99, 235, 0.4)' },
-    { name: 'YouTube', icon: Youtube, color: 'from-red-500 to-rose-400', hoverGlow: 'rgba(239, 68, 68, 0.4)' },
-    { name: 'Email', icon: Mail, color: 'from-purple-500 to-pink-400', hoverGlow: 'rgba(168, 85, 247, 0.4)' },
-    { name: 'Facebook', icon: Facebook, color: 'from-blue-500 to-indigo-500', hoverGlow: 'rgba(59, 130, 246, 0.4)' },
-  ];
-
+  // Festivals dataset preserved
   const festivals = [
-    { name: 'Diwali', emoji: '🪔', color: 'from-[#FF9F1C] to-[#FFB088]', glow: 'rgba(255, 159, 28, 0.4)' },
-    { name: 'Eid', emoji: '🌙', color: 'from-[#22C55E] to-[#16A34A]', glow: 'rgba(34, 197, 94, 0.4)' },
-    { name: 'Holi', emoji: '🎨', color: 'from-[#FF6B9D] to-[#FF9F1C]', glow: 'rgba(255, 107, 157, 0.4)' },
-    { name: 'Navratri', emoji: '💃', color: 'from-[#6366F1] to-[#8B5CF6]', glow: 'rgba(99, 102, 241, 0.4)' },
-    { name: 'Independence Day', emoji: '🇮🇳', color: 'from-[#FF9F1C] to-[#22C55E]', glow: 'rgba(255, 159, 28, 0.4)' },
+    { name: 'Diwali', emoji: '🪔', color: 'from-[#FF9F1C] to-[#FFB088]', glow: 'rgba(255, 159, 28, 0.4)', sample: 'Brighten up your sales this festive season!' },
+    { name: 'Eid', emoji: '🌙', color: 'from-[#22C55E] to-[#16A34A]', glow: 'rgba(34, 197, 94, 0.4)', sample: 'Warm wishes & exclusive holiday discounts.' },
+    { name: 'Holi', emoji: '🎨', color: 'from-[#FF6B9D] to-[#FF9F1C]', glow: 'rgba(255, 107, 157, 0.4)', sample: 'Add vibrant colors to your marketing campaign!' },
+    { name: 'Navratri', emoji: '💃', color: 'from-[#6366F1] to-[#8B5CF6]', glow: 'rgba(99, 102, 241, 0.4)', sample: '9 days of festivity & special customer offers.' },
+    { name: 'Independence Day', emoji: '🇮🇳', color: 'from-[#FF9F1C] to-[#22C55E]', glow: 'rgba(255, 159, 28, 0.4)', sample: 'Celebrate freedom with our special package.' },
   ];
 
+  // Testimonials dataset preserved
   const testimonials = [
     { 
       name: 'Priya Sharma', 
       business: 'Boutique Owner, Mumbai',
       avatar: 'PS',
-      text: 'BrandSetu transformed how I market my boutique. Festival posts that used to take hours now take minutes!',
+      text: 'PitchPleaseAI transformed how I market my boutique. Festival posts that used to take hours now take minutes!',
       gradient: 'from-pink-500 to-purple-500'
     },
     { 
@@ -56,31 +48,51 @@ export function LandingPage() {
       name: 'Meera Patel', 
       business: 'Cafe Owner, Delhi',
       avatar: 'MP',
-      text: 'The AI understands my brand voice perfectly. It\'s like having a marketing team in my pocket!',
+      text: 'The AI understands my brand voice perfectly. It\'s like having a dedicated marketing team in my pocket!',
       gradient: 'from-orange-500 to-rose-500'
     },
   ];
 
-  return (
-    <div className="min-h-screen relative overflow-x-hidden">
-      {/* Animated Gradient Mesh Background */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <motion.div
-          className="absolute inset-0"
-          animate={{
-            background: [
-              'radial-gradient(at 0% 0%, rgba(46, 196, 182, 0.15) 0%, transparent 50%), radial-gradient(at 100% 0%, rgba(77, 157, 224, 0.1) 0%, transparent 50%), radial-gradient(at 100% 100%, rgba(255, 159, 28, 0.1) 0%, transparent 50%)',
-              'radial-gradient(at 100% 0%, rgba(46, 196, 182, 0.15) 0%, transparent 50%), radial-gradient(at 0% 100%, rgba(77, 157, 224, 0.1) 0%, transparent 50%), radial-gradient(at 0% 0%, rgba(255, 159, 28, 0.1) 0%, transparent 50%)',
-              'radial-gradient(at 0% 0%, rgba(46, 196, 182, 0.15) 0%, transparent 50%), radial-gradient(at 100% 0%, rgba(77, 157, 224, 0.1) 0%, transparent 50%), radial-gradient(at 100% 100%, rgba(255, 159, 28, 0.1) 0%, transparent 50%)',
-            ]
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-        />
-      </div>
+  // Real backend platforms
+  const supportedPlatforms = [
+    {
+      id: 'linkedin',
+      name: 'LinkedIn',
+      icon: Linkedin,
+      color: 'from-blue-600 to-blue-400',
+      description: 'Professional thought leadership, industry insights, and b2b campaign copy tailored for corporate networks.',
+      previewText: '🚀 Exciting milestone! We just published our Q3 guide on scaling local retail brand voices using AI context...'
+    },
+    {
+      id: 'twitter',
+      name: 'Twitter / X',
+      icon: Twitter,
+      color: 'from-sky-500 to-cyan-400',
+      description: 'Punchy threads, trending hashtag hooks, and concise announcements engineered for viral engagement.',
+      previewText: 'Thread: 5 ways Indian D2C brands are automating festival marketing without losing authenticity 🧵👇'
+    },
+    {
+      id: 'instagram',
+      name: 'Instagram',
+      icon: Instagram,
+      color: 'from-pink-500 via-rose-500 to-yellow-500',
+      description: 'Engaging captions, carousel scripts, and hashtag strategies paired with festive story templates.',
+      previewText: '✨ Diwali Special! 🪔 Bring festive warmth to your customer base. Swipe left for exclusive festival packages 🛍️'
+    }
+  ];
 
+  const scrollToHowItWorks = () => {
+    const element = document.getElementById('how-it-works');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-white text-[#1d1b19] font-body relative overflow-x-hidden antialiased">
       {/* Sticky Navigation */}
       <motion.header 
-        className="sticky top-0 glass-card-strong z-50 border-b border-white/30"
+        className="sticky top-0 bg-white/95 backdrop-blur-md z-50 border-b border-slate-100 shadow-xs"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100 }}
@@ -94,851 +106,334 @@ export function LandingPage() {
             <Logo size="md" />
           </motion.div>
           
+          <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-[#5b403c]">
+            <a href="#campaign-slider" className="hover:text-[#b51d0d] transition-colors">Platform Engine</a>
+            <a href="#feedbacks" className="hover:text-[#b51d0d] transition-colors">Reviews & Stats</a>
+            <a href="#features" className="hover:text-[#b51d0d] transition-colors">Features</a>
+            <a href="#how-it-works" className="hover:text-[#b51d0d] transition-colors">How It Works</a>
+            <a href="#faq" className="hover:text-[#b51d0d] transition-colors">FAQ</a>
+          </div>
+
           <div className="flex items-center gap-4">
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
+            <Link 
+              to="/auth" 
+              className="text-sm font-semibold text-[#5b403c] hover:text-[#1d1b19] transition-all"
             >
-              <Link 
-                to="/auth" 
-                className="text-[#64748B] hover:text-[#0F172A] transition-all duration-300"
-              >
-                Sign In
-              </Link>
-            </motion.div>
+              Sign In
+            </Link>
             
             <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, type: "spring" }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               <Link 
                 to="/auth"
-                className="relative overflow-hidden px-6 py-2.5 rounded-full bg-gradient-to-r from-[#2EC4B6] via-[#3DDAD7] to-[#4D9DE0] text-white font-medium shadow-[0_8px_24px_rgba(46,196,182,0.3)] hover:shadow-[0_12px_32px_rgba(46,196,182,0.5)] transition-all duration-300 group"
+                className="px-5 py-2.5 rounded-xl bg-[#b51d0d] hover:bg-[#d83824] text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200 block"
               >
-                <span className="relative z-10">Get Started</span>
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-[#4D9DE0] via-[#3DDAD7] to-[#2EC4B6]"
-                  initial={{ x: '100%' }}
-                  whileHover={{ x: 0 }}
-                  transition={{ duration: 0.3 }}
-                />
+                Start Free
               </Link>
             </motion.div>
           </div>
         </nav>
       </motion.header>
 
-      {/* SECTION 1: CINEMATIC HERO */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden py-20">
+      {/* SECTION 1: HERO HEADER & SLIDER SHOWCASE */}
+      <section className="relative overflow-hidden pt-12 lg:pt-16 pb-0 bg-white">
         <motion.div 
-          className="container mx-auto px-6 max-w-7xl relative z-10"
+          className="container mx-auto px-6 max-w-7xl relative z-10 text-center"
           style={{ opacity: heroOpacity, scale: heroScale }}
         >
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left: Content */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2, type: "spring" }}
-            >
-              {/* Badge */}
-              <motion.div 
-                className="inline-flex items-center gap-2 glass-card px-5 py-2.5 rounded-full mb-8 border border-[#4D9DE0]/20"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(77, 157, 224, 0.3)" }}
-              >
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                >
-                  <Sparkles className="w-5 h-5 text-[#4D9DE0]" />
-                </motion.div>
-                <span className="text-sm font-medium bg-gradient-to-r from-[#2EC4B6] via-[#3DDAD7] to-[#4D9DE0] bg-clip-text text-transparent">
-                  AI-Powered Marketing Assistant
-                </span>
-              </motion.div>
-              
-              {/* Main Headline with Shimmer */}
-              <motion.h1 
-                className="text-6xl lg:text-7xl font-bold text-[#0F172A] mb-6 leading-[1.1]"
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.8 }}
-              >
-                Bridge Your Business to{' '}
-                <span className="relative inline-block">
-                  <span className="bg-gradient-to-r from-[#2EC4B6] via-[#3DDAD7] to-[#4D9DE0] bg-clip-text text-transparent">
-                    Growth
-                  </span>
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-[#2EC4B6] via-[#3DDAD7] to-[#4D9DE0] opacity-20 blur-xl"
-                    animate={{ opacity: [0.2, 0.4, 0.2] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
-                </span>
-              </motion.h1>
-              
-              {/* Subtext */}
-              <motion.p 
-                className="text-xl text-[#64748B] mb-10 leading-relaxed max-w-xl"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 }}
-              >
-                Generate multilingual marketing content, festival campaigns, and growth ideas in seconds. 
-                Built for the next generation of Indian businesses.
-              </motion.p>
-
-              {/* CTA Buttons */}
-              <motion.div 
-                className="flex flex-wrap gap-4"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1 }}
-              >
-                <MagneticButton>
-                  <Link 
-                    to="/auth"
-                    className="relative overflow-hidden group px-8 py-4 rounded-2xl bg-gradient-to-r from-[#2EC4B6] via-[#3DDAD7] to-[#4D9DE0] text-white font-semibold shadow-[0_16px_48px_rgba(46,196,182,0.4)] hover:shadow-[0_24px_64px_rgba(46,196,182,0.6)] transition-all duration-300 flex items-center gap-3"
-                  >
-                    <span className="relative z-10">Start Creating for Free</span>
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform relative z-10" />
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-[#4D9DE0] via-[#3DDAD7] to-[#2EC4B6]"
-                      initial={{ x: '100%' }}
-                      whileHover={{ x: 0 }}
-                      transition={{ duration: 0.4 }}
-                    />
-                  </Link>
-                </MagneticButton>
-                
-                <motion.button 
-                  className="glass-card px-8 py-4 rounded-2xl border border-white/40 hover:border-[#2EC4B6]/40 transition-all hover:shadow-[0_16px_48px_rgba(0,0,0,0.08)] flex items-center gap-3 font-semibold text-[#0F172A]"
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Play className="w-5 h-5" />
-                  Watch Demo
-                </motion.button>
-              </motion.div>
-
-              {/* Stats */}
-              <motion.div 
-                className="flex items-center gap-8 mt-12"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.2 }}
-              >
-                <StatItem value="10,000+" label="Businesses" gradient="from-[#2EC4B6] to-[#4D9DE0]" />
-                <div className="h-12 w-px bg-gradient-to-b from-transparent via-[#E5E7EB] to-transparent" />
-                <StatItem value="15+" label="Languages" gradient="from-[#4D9DE0] to-[#8B5CF6]" />
-                <div className="h-12 w-px bg-gradient-to-b from-transparent via-[#E5E7EB] to-transparent" />
-                <StatItem value="50K+" label="Content Created" gradient="from-[#FF9F1C] to-[#FF6B9D]" />
-              </motion.div>
-            </motion.div>
-
-            {/* Right: Floating Preview Cards */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.4 }}
-              className="relative"
-            >
-              <FloatingPreviewCards />
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          className="absolute bottom-10 left-1/2 -translate-x-1/2"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.5 }}
-        >
+          {/* Centered Hero Header */}
           <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="flex flex-col items-center gap-2 text-[#64748B]"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="max-w-4xl mx-auto mb-10"
           >
-            <span className="text-sm font-medium">Scroll to explore</span>
+            {/* Badge */}
             <motion.div 
-              className="w-6 h-10 border-2 border-[#64748B]/30 rounded-full flex items-start justify-center p-1"
-              whileHover={{ borderColor: 'rgba(46, 196, 182, 0.5)' }}
+              className="inline-flex items-center gap-2 bg-[#f8f3ef] border border-[#e4beb7]/60 px-4 py-1.5 rounded-full mb-6"
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
             >
-              <motion.div
-                className="w-1.5 h-2 bg-gradient-to-b from-[#2EC4B6] to-[#4D9DE0] rounded-full"
-                animate={{ y: [0, 16, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
+              <Sparkles className="w-4 h-4 text-[#5647c8]" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#5647c8]">
+                Put AI agents to work for marketing
+              </span>
             </motion.div>
+            
+            {/* Main Headline */}
+            <h1 className="font-headline text-4xl sm:text-5xl lg:text-6xl font-bold text-[#1d1b19] mb-6 leading-[1.12] tracking-tight">
+              AI marketing agents that{' '}
+              <span className="text-[#b51d0d]">
+                actually know your brand
+              </span>
+            </h1>
+            
+            {/* Subhead */}
+            <p className="font-body text-lg sm:text-xl text-[#5b403c] mb-8 leading-relaxed max-w-2xl mx-auto">
+              <strong className="text-[#1d1b19] font-semibold">Researcher, Creator, and Sentinel</strong> agents draft, refine, and approve social content in your brand voice — festival calendar included.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-wrap gap-4 items-center justify-center mb-12">
+              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                <Link 
+                  to="/auth"
+                  className="px-8 py-4 rounded-xl bg-[#b51d0d] hover:bg-[#d83824] text-white font-semibold text-base shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-3"
+                >
+                  <span>Start Free</span>
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </motion.div>
+              
+              <motion.button 
+                onClick={scrollToHowItWorks}
+                className="bg-white border-[1.5px] border-[#1d1b19] px-7 py-4 rounded-xl hover:bg-[#f8f3ef] transition-all font-semibold text-[#1d1b19] flex items-center gap-2"
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                <Play className="w-4 h-4 text-[#1d1b19] fill-[#1d1b19]" />
+                See it in action
+              </motion.button>
+            </div>
           </motion.div>
         </motion.div>
+
+        {/* Feature Slider Showcase Right at the Start of Website */}
+        <div id="campaign-slider">
+          <FeatureSliderSection />
+        </div>
       </section>
 
-      {/* SECTION 2: THE PROBLEM */}
-      <RevealSection>
-        <div className="container mx-auto px-6 py-32 max-w-6xl">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
-          >
+      {/* SECTION 2: SOCIAL PROOF BAR */}
+      <CapabilityBar />
+
+      {/* SECTION 5: HOW IT WORKS (Interactive Car Journey Roadmap) */}
+      <BrandJourneyMap />
+
+
+
+      {/* SECTION 6: FESTIVAL-AWARE CONTENT (FEATURE DEEP-DIVE) */}
+      <section className="py-24 relative z-10 bg-white">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left: Visual Cards */}
             <motion.div
-              className="inline-block mb-6"
-              whileHover={{ scale: 1.1, rotate: 10 }}
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ duration: 0.8 }}
+              className="grid grid-cols-2 sm:grid-cols-3 gap-4"
             >
-              <span className="text-7xl">😰</span>
-            </motion.div>
-            <h2 className="text-5xl font-bold text-[#0F172A] mb-6">
-              Marketing feels{' '}
-              <span className="bg-gradient-to-r from-[#EF4444] to-[#F59E0B] bg-clip-text text-transparent">
-                overwhelming
-              </span>
-            </h2>
-            <p className="text-xl text-[#64748B] max-w-2xl mx-auto leading-relaxed">
-              Creating content for multiple platforms, in multiple languages, for every festival and occasion? 
-              It's exhausting and time-consuming.
-            </p>
-          </motion.div>
-
-          <motion.div
-            className="grid md:grid-cols-3 gap-6"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, staggerChildren: 0.1 }}
-          >
-            <ProblemCard 
-              icon="⏰"
-              title="Too Time-Consuming"
-              description="Hours spent creating posts for each platform and language"
-            />
-            <ProblemCard 
-              icon="💸"
-              title="Expensive Agencies"
-              description="Marketing agencies charge thousands per month"
-            />
-            <ProblemCard 
-              icon="🤯"
-              title="Creative Block"
-              description="Running out of fresh content ideas every single day"
-            />
-          </motion.div>
-        </div>
-      </RevealSection>
-
-      {/* SECTION 3: THE SOLUTION */}
-      <RevealSection bgGradient>
-        <div className="container mx-auto px-6 py-32 max-w-7xl">
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <motion.div
-              className="inline-flex items-center gap-3 glass-card px-6 py-3 rounded-full mb-6 border border-[#22C55E]/20"
-              whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(34, 197, 94, 0.3)" }}
-            >
-              <Zap className="w-5 h-5 text-[#22C55E]" />
-              <span className="font-medium bg-gradient-to-r from-[#22C55E] to-[#16A34A] bg-clip-text text-transparent">
-                The Solution
-              </span>
-            </motion.div>
-            
-            <h2 className="text-6xl font-bold text-[#0F172A] mb-6">
-              Meet{' '}
-              <span className="bg-gradient-to-r from-[#2EC4B6] via-[#3DDAD7] to-[#4D9DE0] bg-clip-text text-transparent">
-                BrandSetu
-              </span>
-            </h2>
-            <p className="text-2xl text-[#64748B] max-w-3xl mx-auto leading-relaxed">
-              Your AI-powered marketing companion that generates engaging content in seconds, 
-              not hours. In any language. For any platform.
-            </p>
-          </motion.div>
-
-          {/* Demo Video/Animation Placeholder */}
-          <motion.div
-            className="relative max-w-5xl mx-auto"
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, type: "spring" }}
-          >
-            <div className="glass-card-strong rounded-3xl p-8 border border-white/40 shadow-[0_32px_80px_rgba(0,0,0,0.12)] relative overflow-hidden">
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-[#2EC4B6]/5 to-[#4D9DE0]/5"
-                animate={{
-                  background: [
-                    'linear-gradient(135deg, rgba(46, 196, 182, 0.05) 0%, rgba(77, 157, 224, 0.05) 100%)',
-                    'linear-gradient(135deg, rgba(77, 157, 224, 0.05) 0%, rgba(46, 196, 182, 0.05) 100%)',
-                    'linear-gradient(135deg, rgba(46, 196, 182, 0.05) 0%, rgba(77, 157, 224, 0.05) 100%)',
-                  ]
-                }}
-                transition={{ duration: 5, repeat: Infinity }}
-              />
-              
-              <div className="relative z-10 aspect-video bg-gradient-to-br from-[#0F172A] to-[#1E293B] rounded-2xl flex items-center justify-center">
+              {festivals.map((fest, idx) => (
                 <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  className="w-20 h-20 bg-gradient-to-br from-[#2EC4B6] to-[#4D9DE0] rounded-full flex items-center justify-center cursor-pointer shadow-[0_0_40px_rgba(46,196,182,0.5)]"
+                  key={fest.name}
+                  whileHover={{ scale: 1.05, y: -4 }}
+                  className="glass-card-strong rounded-2xl p-4 text-center border border-white/40 shadow-sm cursor-pointer"
                 >
-                  <Play className="w-10 h-10 text-white ml-1" />
+                  <div className="text-4xl mb-2">{fest.emoji}</div>
+                  <div className="text-sm font-bold text-[#0F172A] mb-1">{fest.name}</div>
+                  <div className="text-[11px] text-[#64748B] line-clamp-2">{fest.sample}</div>
                 </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Right: Copy */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.1 }}
+              transition={{ duration: 0.8 }}
+            >
+              <div className="inline-flex items-center gap-2 bg-[#f8f3ef] border border-[#e4beb7]/50 px-3.5 py-1.5 rounded-full mb-4">
+                <span className="text-sm">🪔</span>
+                <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#b51d0d]">
+                  Cultural Intelligence
+                </span>
               </div>
-            </div>
-          </motion.div>
-        </div>
-      </RevealSection>
-
-      {/* SECTION 4: HOW IT WORKS */}
-      <RevealSection>
-        <div className="container mx-auto px-6 py-32 max-w-7xl">
-          <motion.div
-            className="text-center mb-20"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-5xl font-bold text-[#0F172A] mb-6">
-              How It Works
-            </h2>
-            <p className="text-xl text-[#64748B] max-w-2xl mx-auto">
-              Start creating amazing content in 3 simple steps
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <StepCard 
-              step="1"
-              icon={Target}
-              title="Tell us about your business"
-              description="Share your business details, industry, and brand voice"
-              delay={0}
-            />
-            <StepCard 
-              step="2"
-              icon={Globe}
-              title="Choose your goals"
-              description="Select content type, platform, and language"
-              delay={0.2}
-            />
-            <StepCard 
-              step="3"
-              icon={Sparkles}
-              title="Generate & Publish"
-              description="Get AI-powered content ready to share instantly"
-              delay={0.4}
-            />
-          </div>
-        </div>
-      </RevealSection>
-
-      {/* SECTION 5: PUBLISH EVERYWHERE */}
-      <RevealSection bgGradient>
-        <div className="container mx-auto px-6 py-32 max-w-7xl">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-5xl font-bold text-[#0F172A] mb-6">
-              Publish{' '}
-              <span className="bg-gradient-to-r from-[#2EC4B6] to-[#4D9DE0] bg-clip-text text-transparent">
-                Everywhere
-              </span>
-            </h2>
-            <p className="text-xl text-[#64748B] max-w-2xl mx-auto">
-              Create content optimized for all major platforms
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {platforms.map((platform, index) => {
-              const Icon = platform.icon;
-              return (
-                <motion.div
-                  key={platform.name}
-                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1, type: "spring" }}
-                  whileHover={{ 
-                    scale: 1.1, 
-                    y: -8,
-                    boxShadow: `0 20px 60px ${platform.hoverGlow}`
-                  }}
-                  className="glass-card-strong rounded-3xl p-8 text-center shadow-[0_8px_32px_rgba(0,0,0,0.08)] transition-all cursor-pointer border border-white/40 group"
-                >
-                  <motion.div
-                    whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.2 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <Icon className={`w-12 h-12 mx-auto mb-4 bg-gradient-to-br ${platform.color} bg-clip-text text-transparent`} strokeWidth={1.5} />
-                  </motion.div>
-                  <div className="font-semibold text-[#0F172A] group-hover:bg-gradient-to-r group-hover:from-[#2EC4B6] group-hover:to-[#4D9DE0] group-hover:bg-clip-text group-hover:text-transparent transition-all">
-                    {platform.name}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </RevealSection>
-
-      {/* SECTION 6: FESTIVAL CAMPAIGNS */}
-      <RevealSection>
-        <div className="container mx-auto px-6 py-32 max-w-7xl">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <motion.div
-              className="inline-block mb-6"
-              animate={{ rotate: [0, 10, -10, 10, 0] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-            >
-              <span className="text-7xl">🎉</span>
+              <h2 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1d1b19] mb-6 leading-tight">
+                Diwali, Eid, Holi, Independence Day —{' '}
+                <span className="text-[#b51d0d]">
+                  PitchPleaseAI drafts for it automatically
+                </span>
+              </h2>
+              <p className="text-lg text-[#64748B] mb-6 leading-relaxed">
+                Unlike generic Western marketing AI tools, PitchPleaseAI comes pre-loaded with an Indian festival calendar. It anticipates holiday rushes and generates culturally authentic campaigns ahead of time.
+              </p>
+              <div className="glass-card rounded-2xl p-4 border border-white/30 flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#FF9F1C] to-[#FF6B9D] text-white flex items-center justify-center font-bold text-lg">
+                  🇮🇳
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-[#0F172A]">Automated Calendar Reminders</h4>
+                  <p className="text-xs text-[#64748B]">Get campaign drafts 7 days before major regional and national festivals.</p>
+                </div>
+              </div>
             </motion.div>
-            <h2 className="text-5xl font-bold text-[#0F172A] mb-6">
-              Festival Campaigns Made{' '}
-              <span className="bg-gradient-to-r from-[#FF9F1C] to-[#FF6B9D] bg-clip-text text-transparent">
-                Magical
-              </span>
-            </h2>
-            <p className="text-xl text-[#64748B] max-w-2xl mx-auto">
-              Never miss a festival moment. Generate culturally relevant content for every celebration.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-6">
-            {festivals.map((festival, index) => (
-              <motion.div
-                key={festival.name}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.1, type: "spring" }}
-                whileHover={{ 
-                  scale: 1.05, 
-                  y: -8,
-                  boxShadow: `0 20px 60px ${festival.glow}`
-                }}
-                className="glass-card-strong rounded-3xl p-6 text-center relative overflow-hidden border-2 border-white/40 group cursor-pointer"
-              >
-                {/* Glow Halo */}
-                <motion.div
-                  className={`absolute inset-0 bg-gradient-to-br ${festival.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
-                  animate={{
-                    opacity: [0.05, 0.15, 0.05]
-                  }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                />
-                
-                {/* Gradient Border */}
-                <motion.div
-                  className={`absolute inset-0 bg-gradient-to-br ${festival.color} opacity-0 group-hover:opacity-20 rounded-3xl`}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  whileHover={{ scale: 1.2, opacity: 0.2 }}
-                  transition={{ duration: 0.5 }}
-                />
-                
-                <div className="relative z-10">
-                  <motion.div
-                    className="text-6xl mb-4"
-                    whileHover={{ 
-                      scale: 1.3, 
-                      rotate: [0, -10, 10, -10, 0] 
-                    }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    {festival.emoji}
-                  </motion.div>
-                  <div className="font-bold text-[#0F172A]">{festival.name}</div>
-                </div>
-                
-                {/* Sparkle Effect */}
-                <motion.div
-                  className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full"
-                  animate={{
-                    scale: [0, 1, 0],
-                    opacity: [0, 1, 0]
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    delay: index * 0.3
-                  }}
-                />
-              </motion.div>
-            ))}
           </div>
         </div>
-      </RevealSection>
+      </section>
 
-      {/* SECTION 7: SOCIAL PROOF */}
-      <RevealSection bgGradient>
-        <div className="container mx-auto px-6 py-32 max-w-7xl">
+
+
+      {/* SECTION 8: PROVEN IMPACT, BENTO REVIEWS & STATISTICS */}
+      <FeedbackBentoSection />
+
+      {/* SECTION 10: FAQ */}
+      <section id="faq" className="py-24 relative z-10">
+        <div className="container mx-auto px-6 max-w-4xl">
           <motion.div
             className="text-center mb-16"
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, amount: 0.1 }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-5xl font-bold text-[#0F172A] mb-6">
-              Loved by Businesses{' '}
-              <span className="bg-gradient-to-r from-[#2EC4B6] to-[#4D9DE0] bg-clip-text text-transparent">
-                Across Bharat
+            <div className="inline-flex items-center gap-2 bg-[#f8f3ef] border border-[#e4beb7]/50 px-3.5 py-1.5 rounded-full mb-4">
+              <HelpCircle className="w-3.5 h-3.5 text-[#b51d0d]" />
+              <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#b51d0d]">
+                Frequently Asked Questions
               </span>
+            </div>
+            <h2 className="font-headline text-4xl lg:text-5xl font-extrabold text-[#1d1b19] mb-4">
+              Everything You <span className="text-[#b51d0d]">Need to Know</span>
             </h2>
-            <p className="text-xl text-[#64748B] max-w-2xl mx-auto">
-              See what our customers have to say
+            <p className="text-lg text-[#64748B]">
+              Clear answers to how PitchPleaseAI powers your marketing pipeline.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={testimonial.name}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: index * 0.15, type: "spring" }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="glass-card-strong rounded-3xl p-8 shadow-[0_16px_48px_rgba(0,0,0,0.08)] hover:shadow-[0_24px_64px_rgba(0,0,0,0.12)] transition-all border border-white/40"
-              >
-                <div className="flex gap-1 mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <motion.span 
-                      key={i}
-                      initial={{ opacity: 0, scale: 0 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.15 + i * 0.05 }}
-                      viewport={{ once: true }}
-                      className="text-[#FF9F1C] text-xl"
-                    >
-                      ★
-                    </motion.span>
-                  ))}
-                </div>
-                <p className="text-[#0F172A] mb-6 italic leading-relaxed">
-                  "{testimonial.text}"
-                </p>
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 bg-gradient-to-br ${testimonial.gradient} rounded-full flex items-center justify-center text-white font-bold shadow-lg`}>
-                    {testimonial.avatar}
-                  </div>
-                  <div>
-                    <div className="font-bold text-[#0F172A]">{testimonial.name}</div>
-                    <div className="text-sm text-[#64748B]">{testimonial.business}</div>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </RevealSection>
-
-      {/* SECTION 8: FINAL CTA */}
-      <RevealSection>
-        <div className="container mx-auto px-6 py-32 max-w-5xl">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, type: "spring" }}
-            whileHover={{ scale: 1.02 }}
-            className="relative overflow-hidden rounded-[2.5rem] p-16 text-center text-white shadow-[0_32px_80px_rgba(0,0,0,0.15)]"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.1 }}
+            transition={{ duration: 0.6 }}
+            className="glass-card-strong rounded-3xl p-6 sm:p-8 border border-white/40 shadow-[0_16px_48px_rgba(0,0,0,0.06)]"
           >
-            {/* Animated Gradient Background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#2EC4B6] via-[#4D9DE0] to-[#6366F1]" />
-            <motion.div 
-              className="absolute inset-0 opacity-30"
-              animate={{ 
-                background: [
-                  'radial-gradient(circle at 0% 0%, rgba(255,255,255,0.4) 0%, transparent 50%)',
-                  'radial-gradient(circle at 100% 100%, rgba(255,255,255,0.4) 0%, transparent 50%)',
-                  'radial-gradient(circle at 0% 100%, rgba(255,255,255,0.4) 0%, transparent 50%)',
-                  'radial-gradient(circle at 100% 0%, rgba(255,255,255,0.4) 0%, transparent 50%)',
-                  'radial-gradient(circle at 0% 0%, rgba(255,255,255,0.4) 0%, transparent 50%)',
-                ]
-              }}
-              transition={{ duration: 10, repeat: Infinity }}
-            />
-            
-            <div className="relative z-10">
-              <motion.h2 
-                className="text-5xl lg:text-6xl font-bold mb-6"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-              >
-                Ready to Transform Your Marketing?
-              </motion.h2>
-              <motion.p 
-                className="text-xl mb-10 opacity-90 max-w-2xl mx-auto"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.3 }}
-              >
-                Join thousands of businesses using AI to power their growth. Start creating in seconds.
-              </motion.p>
-              
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.4 }}
-              >
-                <MagneticButton>
-                  <Link 
-                    to="/auth"
-                    className="inline-flex items-center gap-3 glass-card-strong text-[#2EC4B6] px-10 py-5 rounded-2xl hover:shadow-[0_24px_64px_rgba(255,255,255,0.3)] transition-all group border border-white/40 font-bold text-lg"
-                  >
-                    Start Free Today
-                    <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                  </Link>
-                </MagneticButton>
-              </motion.div>
+            <Accordion type="single" collapsible className="w-full divide-y divide-slate-200/60">
+              <AccordionItem value="item-1">
+                <AccordionTrigger className="text-base font-bold text-[#0F172A] hover:no-underline hover:text-[#2EC4B6]">
+                  Is this just ChatGPT with a UI wrapper?
+                </AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed text-sm">
+                  No. PitchPleaseAI runs an autonomous multi-agent pipeline (Researcher, Creator, and Sentinel). Instead of generating raw unedited text from a single prompt, Sentinel continuously inspects, critiques, and refines every draft against your stored brand guidelines until it clears strict quality standards.
+                </AccordionContent>
+              </AccordionItem>
 
-              <motion.p
-                className="mt-8 text-sm opacity-75"
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 0.75 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.6 }}
-              >
-                No credit card required • Setup in 2 minutes • Cancel anytime
-              </motion.p>
-            </div>
+              <AccordionItem value="item-2">
+                <AccordionTrigger className="text-base font-bold text-[#0F172A] hover:no-underline hover:text-[#2EC4B6]">
+                  How does PitchPleaseAI learn my brand tone?
+                </AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed text-sm">
+                  PitchPleaseAI utilizes Retrieval-Augmented Generation (RAG). Your company mission, target audience, preferred tone, and prohibited terms are stored in vector memory and retrieved before every generation pass to ensure 100% brand voice fidelity.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-3">
+                <AccordionTrigger className="text-base font-bold text-[#0F172A] hover:no-underline hover:text-[#2EC4B6]">
+                  What platforms can I post to?
+                </AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed text-sm">
+                  PitchPleaseAI generates native, platform-specific content for LinkedIn, Twitter / X, and Instagram, matching formatting rules, hashtag conventions, and character limits for each platform.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-4">
+                <AccordionTrigger className="text-base font-bold text-[#0F172A] hover:no-underline hover:text-[#2EC4B6]">
+                  Is my business data private?
+                </AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed text-sm">
+                  Yes. All user data, brand memories, and content drafts are strictly protected via Supabase Row-Level Security (RLS) at the database layer. Your data is never exposed client-side or shared across tenants.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-5">
+                <AccordionTrigger className="text-base font-bold text-[#0F172A] hover:no-underline hover:text-[#2EC4B6]">
+                  What does it cost?
+                </AccordionTrigger>
+                <AccordionContent className="text-slate-600 leading-relaxed text-sm">
+                  You can get started completely free to experience the multi-agent pipeline and generate your first batch of festival and social campaigns. Upgrades are available for higher posting volumes and team collaboration.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </motion.div>
         </div>
-      </RevealSection>
+      </section>
+
+
 
       {/* Footer */}
-      <footer className="glass-card-strong border-t border-white/30 py-16">
+      <footer className="glass-card-strong border-t border-white/30 py-16 relative z-10">
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div>
               <Logo size="md" />
-              <p className="text-[#64748B] mt-4 leading-relaxed">
-                Bridging businesses with growth through AI-powered marketing.
+              <p className="text-sm text-[#64748B] mt-4 leading-relaxed">
+                Bridging businesses with growth through AI-powered marketing agents.
               </p>
             </div>
             <div>
-              <h4 className="font-bold text-[#0F172A] mb-4">Product</h4>
-              <ul className="space-y-3 text-[#64748B]">
-                <li><a href="#" className="hover:text-[#2EC4B6] transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-[#2EC4B6] transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-[#2EC4B6] transition-colors">Demo</a></li>
+              <h4 className="font-bold text-sm text-[#0F172A] mb-4">Product</h4>
+              <ul className="space-y-2.5 text-xs font-medium text-[#64748B]">
+                <li><a href="#features" className="hover:text-[#2EC4B6] transition-colors">Features</a></li>
+                <li><a href="#how-it-works" className="hover:text-[#2EC4B6] transition-colors">How It Works</a></li>
+                <li><a href="#faq" className="hover:text-[#2EC4B6] transition-colors">FAQ</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold text-[#0F172A] mb-4">Resources</h4>
-              <ul className="space-y-3 text-[#64748B]">
-                <li><a href="#" className="hover:text-[#2EC4B6] transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-[#2EC4B6] transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-[#2EC4B6] transition-colors">Community</a></li>
+              <h4 className="font-bold text-sm text-[#0F172A] mb-4">Core Agents</h4>
+              <ul className="space-y-2.5 text-xs font-medium text-[#64748B]">
+                <li><span className="hover:text-[#2EC4B6]">Researcher Agent</span></li>
+                <li><span className="hover:text-[#2EC4B6]">Creator Agent</span></li>
+                <li><span className="hover:text-[#2EC4B6]">Sentinel Agent</span></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold text-[#0F172A] mb-4">Company</h4>
-              <ul className="space-y-3 text-[#64748B]">
-                <li><a href="#" className="hover:text-[#2EC4B6] transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-[#2EC4B6] transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-[#2EC4B6] transition-colors">Privacy</a></li>
+              <h4 className="font-bold text-sm text-[#0F172A] mb-4">Security</h4>
+              <ul className="space-y-2.5 text-xs font-medium text-[#64748B]">
+                <li><span className="hover:text-[#2EC4B6]">Supabase RLS</span></li>
+                <li><span className="hover:text-[#2EC4B6]">Serverless Execution</span></li>
+                <li><span className="hover:text-[#2EC4B6]">Brand Memory Security</span></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-white/30 pt-8 text-center text-[#64748B]">
-            <p>© 2026 BrandSetu. Made with ❤️ for Bharat's entrepreneurs.</p>
+          <div className="border-t border-slate-200/60 pt-8 text-center text-xs text-[#64748B]">
+            <p>© 2026 PitchPleaseAI. Made with ❤️ for Bharat's entrepreneurs.</p>
           </div>
         </div>
       </footer>
-
-      {/* Floating Back to Top Button */}
-      <FloatingBackToTop />
     </div>
   );
 }
 
-// Helper Components
+// Helper StepCard component with staggered entrance
+function StepCard({ step, title, tagline, description, delay }: { step: string; title: string; tagline: string; description: string; delay: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
 
-function StatItem({ value, label, gradient }: { value: string; label: string; gradient: string }) {
-  return (
-    <motion.div whileHover={{ scale: 1.05 }}>
-      <div className={`text-4xl font-bold bg-gradient-to-r ${gradient} bg-clip-text text-transparent`}>
-        {value}
-      </div>
-      <div className="text-sm text-[#64748B] mt-1">{label}</div>
-    </motion.div>
-  );
-}
-
-function ProblemCard({ icon, title, description }: { icon: string; title: string; description: string }) {
   return (
     <motion.div
-      whileHover={{ y: -8, scale: 1.02 }}
-      className="glass-card rounded-3xl p-8 border border-white/40 text-center shadow-[0_8px_32px_rgba(0,0,0,0.08)] hover:shadow-[0_16px_48px_rgba(0,0,0,0.12)] transition-all"
-    >
-      <motion.div
-        className="text-6xl mb-4"
-        whileHover={{ scale: 1.2, rotate: [0, -10, 10, 0] }}
-        transition={{ duration: 0.5 }}
-      >
-        {icon}
-      </motion.div>
-      <h3 className="text-xl font-bold text-[#0F172A] mb-3">{title}</h3>
-      <p className="text-[#64748B]">{description}</p>
-    </motion.div>
-  );
-}
-
-function StepCard({ step, icon: Icon, title, description, delay }: any) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8, delay, type: "spring" }}
-      whileHover={{ y: -8, scale: 1.02 }}
-      className="glass-card-strong rounded-3xl p-8 shadow-[0_16px_48px_rgba(0,0,0,0.08)] hover:shadow-[0_24px_64px_rgba(0,0,0,0.12)] transition-all border border-white/40 relative overflow-hidden group"
-    >
-      <motion.div
-        className="absolute inset-0 bg-gradient-to-br from-[#2EC4B6]/5 to-[#4D9DE0]/5 opacity-0 group-hover:opacity-100 transition-opacity"
-      />
-      <div className="relative z-10">
-        <motion.div 
-          className="w-16 h-16 bg-gradient-to-br from-[#2EC4B6] via-[#3DDAD7] to-[#4D9DE0] rounded-2xl flex items-center justify-center text-white text-2xl font-bold mb-6 shadow-[0_0_30px_rgba(46,196,182,0.4)]"
-          whileHover={{ rotate: 360, scale: 1.1 }}
-          transition={{ duration: 0.6 }}
-        >
-          {step}
-        </motion.div>
-        <div className="mb-4">
-          <Icon className="w-8 h-8 text-[#2EC4B6]" />
-        </div>
-        <h3 className="text-xl font-bold text-[#0F172A] mb-3">{title}</h3>
-        <p className="text-[#64748B] leading-relaxed">{description}</p>
-      </div>
-    </motion.div>
-  );
-}
-
-function RevealSection({ children, bgGradient = false }: { children: React.ReactNode; bgGradient?: boolean }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
-  return (
-    <motion.section
       ref={ref}
-      initial={{ opacity: 0 }}
-      animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-      transition={{ duration: 0.8 }}
-      className={`relative ${bgGradient ? 'bg-gradient-to-b from-transparent via-[#F8FAFC] to-transparent' : ''}`}
+      initial={{ opacity: 0, y: 30 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+      transition={{ duration: 0.6, delay }}
+      whileHover={{ y: -6 }}
+      className="glass-card-strong rounded-3xl p-8 border border-white/40 shadow-[0_16px_48px_rgba(0,0,0,0.08)] relative overflow-hidden flex flex-col justify-between"
     >
-      {children}
-    </motion.section>
-  );
-}
-
-function MagneticButton({ children }: { children: React.ReactNode }) {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const buttonRef = useRef<HTMLDivElement>(null);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!buttonRef.current) return;
-    const rect = buttonRef.current.getBoundingClientRect();
-    const x = (e.clientX - rect.left - rect.width / 2) / 3;
-    const y = (e.clientY - rect.top - rect.height / 2) / 3;
-    setPosition({ x, y });
-  };
-
-  const handleMouseLeave = () => {
-    setPosition({ x: 0, y: 0 });
-  };
-
-  return (
-    <motion.div
-      ref={buttonRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      animate={{ x: position.x, y: position.y }}
-      transition={{ type: "spring", stiffness: 150, damping: 15 }}
-      className="inline-block"
-    >
-      {children}
+      <div>
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2EC4B6] via-[#3DDAD7] to-[#4D9DE0] text-white flex items-center justify-center font-bold text-xl mb-6 shadow-md">
+          {step}
+        </div>
+        <h3 className="text-2xl font-bold text-[#0F172A] mb-1">{title}</h3>
+        <div className="text-xs font-semibold text-[#2EC4B6] uppercase tracking-wider mb-4">
+          {tagline}
+        </div>
+        <p className="text-sm text-[#64748B] leading-relaxed">
+          {description}
+        </p>
+      </div>
     </motion.div>
-  );
-}
-
-function FloatingBackToTop() {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const toggleVisibility = () => {
-      if (window.pageYOffset > 500) {
-        setIsVisible(true);
-      } else {
-        setIsVisible(false);
-      }
-    };
-
-    window.addEventListener('scroll', toggleVisibility);
-    return () => window.removeEventListener('scroll', toggleVisibility);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.button
-          initial={{ opacity: 0, scale: 0 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0 }}
-          onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-50 w-14 h-14 glass-card-strong rounded-full flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.12)] hover:shadow-[0_16px_48px_rgba(46,196,182,0.3)] border border-white/40 group"
-          whileHover={{ scale: 1.1, y: -2 }}
-          whileTap={{ scale: 0.9 }}
-        >
-          <motion.div
-            animate={{ y: [0, -4, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="bg-gradient-to-r from-[#2EC4B6] to-[#4D9DE0] bg-clip-text text-transparent"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-            </svg>
-          </motion.div>
-        </motion.button>
-      )}
-    </AnimatePresence>
   );
 }

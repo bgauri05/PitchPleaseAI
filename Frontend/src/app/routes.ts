@@ -25,6 +25,10 @@ export const router = createBrowserRouter([
     Component: BusinessSetup,
   },
   {
+    path: "/business-setup",
+    Component: BusinessSetup,
+  },
+  {
     path: "/app",
     Component: ProtectedRoute,
     children: [{

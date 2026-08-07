@@ -592,7 +592,7 @@ export function ContentGenerator() {
                                     <div className="flex items-center justify-between mt-6">
                                       <div className="flex items-center gap-2">
                                         <Sparkles className="w-5 h-5 text-[#2EC4B6]" />
-                                        <span className="text-xs font-bold text-white tracking-wide">BrandSetu</span>
+                                        <span className="text-xs font-bold text-white tracking-wide">PitchPleaseAI</span>
                                       </div>
                                       <span className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white bg-white/20 backdrop-blur-sm rounded-full">
                                         Link in Bio
@@ -609,7 +609,7 @@ export function ContentGenerator() {
                                     if (!posterRef.current) return;
                                     const canvas = await html2canvas(posterRef.current, { useCORS: true, scale: 2 });
                                     const link = document.createElement('a');
-                                    link.download = 'brandsetu-poster.png';
+                                    link.download = 'pitchplease-ai-poster.png';
                                     link.href = canvas.toDataURL('image/png');
                                     link.click();
                                   }}

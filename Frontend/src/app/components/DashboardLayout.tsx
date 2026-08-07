@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router';
-import { Home, Sparkles, Calendar, PartyPopper, FolderOpen, Settings, LogOut, Menu, X, Bell, User, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Home, Sparkles, Calendar, PartyPopper, FolderOpen, Settings, LogOut, Menu, X, Bell, ArrowLeft, ChevronRight } from 'lucide-react';
 import { Logo } from './Logo';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -35,7 +35,6 @@ export function DashboardLayout() {
     return location.pathname.startsWith(path);
   };
 
-  // Generate breadcrumbs
   const getBreadcrumbs = () => {
     const paths = location.pathname.split('/').filter(Boolean);
     const breadcrumbs = [{ label: 'Home', path: '/app' }];
@@ -55,7 +54,7 @@ export function DashboardLayout() {
   const showBackButton = location.pathname !== '/app';
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-[#fef8f4] text-[#1d1b19]">
       {/* Mobile Sidebar Overlay */}
       <AnimatePresence>
         {sidebarOpen && (
@@ -64,7 +63,7 @@ export function DashboardLayout() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setSidebarOpen(false)}
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
           />
         )}
       </AnimatePresence>
@@ -73,14 +72,14 @@ export function DashboardLayout() {
       <motion.aside
         initial={false}
         animate={{ x: sidebarOpen ? 0 : -300 }}
-        className="fixed lg:sticky top-0 left-0 h-screen w-64 glass-card-strong border-r border-white/30 flex flex-col z-50 lg:translate-x-0 transition-transform shadow-[0_8px_32px_rgba(0,0,0,0.08)]"
+        className="fixed lg:sticky top-0 left-0 h-screen w-64 bg-white/90 backdrop-blur-md border-r border-[#e4beb7]/40 flex flex-col z-50 lg:translate-x-0 transition-transform shadow-[0_8px_32px_rgba(18,17,15,0.06)]"
       >
         {/* Logo Section */}
-        <div className="p-6 border-b border-white/30 flex items-center justify-between">
+        <div className="p-6 border-b border-[#e6e2de] flex items-center justify-between">
           <Logo size="md" />
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-[#64748B] hover:text-[#0F172A] p-2 hover:bg-white/40 rounded-xl transition-all"
+            className="lg:hidden text-[#5b403c] hover:text-[#1d1b19] p-2 hover:bg-[#f8f3ef] rounded-xl transition-all"
           >
             <X className="w-6 h-6" />
           </button>
@@ -88,7 +87,7 @@ export function DashboardLayout() {
 
         {/* Navigation */}
         <nav className="flex-1 p-4 overflow-y-auto">
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
@@ -101,21 +100,21 @@ export function DashboardLayout() {
                   <Link
                     to={item.path}
                     onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all relative overflow-hidden group ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all relative overflow-hidden group text-sm font-medium ${
                       active
                         ? 'text-white'
-                        : 'text-[#64748B] hover:text-[#0F172A]'
+                        : 'text-[#5b403c] hover:text-[#1d1b19]'
                     }`}
                   >
                     {active && (
                       <motion.div
                         layoutId="activeNav"
-                        className="absolute inset-0 bg-gradient-to-r from-[#2EC4B6] to-[#4D9DE0] rounded-xl shadow-[0_8px_24px_rgba(46,196,182,0.3)]"
+                        className="absolute inset-0 bg-[#b51d0d] rounded-xl shadow-sm"
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       />
                     )}
                     {!active && (
-                      <div className="absolute inset-0 bg-white/40 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute inset-0 bg-[#f8f3ef] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
                     )}
                     <Icon className="w-5 h-5 relative z-10" />
                     <span className="relative z-10">{item.label}</span>
@@ -125,11 +124,11 @@ export function DashboardLayout() {
             })}
           </div>
 
-          <div className="mt-8 pt-8 border-t border-white/30 space-y-2">
+          <div className="mt-8 pt-8 border-t border-[#e6e2de] space-y-1.5">
             <motion.div whileHover={{ x: 4 }} whileTap={{ scale: 0.98 }}>
               <Link
                 to="/app/settings"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#64748B] hover:text-[#0F172A] hover:bg-white/40 transition-all"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[#5b403c] hover:text-[#1d1b19] hover:bg-[#f8f3ef] transition-all"
               >
                 <Settings className="w-5 h-5" />
                 <span>Settings</span>
@@ -139,141 +138,82 @@ export function DashboardLayout() {
         </nav>
 
         {/* User Section */}
-        <div className="p-4 border-t border-white/30">
+        <div className="p-4 border-t border-[#e6e2de]">
           <motion.div 
-            className="glass-card flex items-center gap-3 p-3 rounded-xl border border-white/30"
+            className="flex items-center gap-3 p-3 rounded-xl bg-[#f8f3ef] border border-[#e4beb7]/30"
             whileHover={{ scale: 1.02 }}
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-[#2EC4B6] to-[#4D9DE0] rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(46,196,182,0.4)]">
+            <div className="w-10 h-10 bg-[#b51d0d] rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-sm">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="font-medium text-[#0F172A] truncate">{displayName}</div>
-              <div className="text-xs text-[#64748B] truncate">{email}</div>
+              <p className="text-sm font-semibold text-[#1d1b19] truncate">{displayName}</p>
+              <p className="text-xs text-[#5b403c] truncate">{email}</p>
             </div>
-            <motion.button 
-              whileHover={{ scale: 1.1, rotate: 10 }}
-              whileTap={{ scale: 0.9 }}
+            <button
               onClick={handleSignOut}
-              className="text-[#64748B] hover:text-[#EF4444] transition-colors"
+              className="p-1.5 text-[#5b403c] hover:text-[#b51d0d] hover:bg-white rounded-lg transition-colors"
+              title="Sign Out"
             >
-              <LogOut className="w-5 h-5" />
-            </motion.button>
+              <LogOut className="w-4 h-4" />
+            </button>
           </motion.div>
         </div>
       </motion.aside>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen">
-        {/* Top Bar */}
-        <header className="sticky top-0 glass-card-strong z-30 border-b border-white/30 shadow-[0_4px_16px_rgba(0,0,0,0.04)]">
-          <div className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="lg:hidden text-[#64748B] hover:text-[#0F172A] p-2 hover:bg-white/40 rounded-xl transition-all"
-              >
-                <Menu className="w-6 h-6" />
-              </button>
-              
-              {/* Breadcrumbs */}
-              <div className="hidden md:flex items-center gap-2 text-sm">
-                {breadcrumbs.map((crumb, index) => (
-                  <div key={crumb.path} className="flex items-center gap-2">
-                    {index > 0 && <ChevronRight className="w-4 h-4 text-[#94A3B8]" />}
-                    <Link
-                      to={crumb.path}
-                      className={`transition-colors ${
-                        index === breadcrumbs.length - 1
-                          ? 'text-[#0F172A] font-medium'
-                          : 'text-[#64748B] hover:text-[#2EC4B6]'
-                      }`}
-                    >
-                      {crumb.label}
-                    </Link>
-                  </div>
-                ))}
-              </div>
-              
-              {/* Mobile: Show back button and title */}
-              <div className="md:hidden flex items-center gap-3">
-                {showBackButton && (
-                  <motion.button
-                    whileHover={{ scale: 1.1, x: -2 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => window.history.back()}
-                    className="p-2 hover:bg-white/40 rounded-xl transition-all text-[#64748B] hover:text-[#0F172A]"
-                  >
-                    <ArrowLeft className="w-5 h-5" />
-                  </motion.button>
-                )}
-                <div>
-                  <h1 className="text-xl font-bold text-[#0F172A]">Good morning, {displayName}! ☀️</h1>
-                  <p className="text-xs text-[#64748B]">Let's create something amazing</p>
-                </div>
-              </div>
-              
-              {/* Desktop: Show greeting */}
-              <div className="hidden md:block ml-6">
-                <h1 className="text-2xl font-bold text-[#0F172A]">Good morning, {displayName}! ☀️</h1>
-                <p className="text-sm text-[#64748B]">Let's create something amazing today</p>
-              </div>
-            </div>
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top Header */}
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#e4beb7]/40 px-6 py-4 flex items-center justify-between shadow-xs">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden text-[#5b403c] hover:text-[#1d1b19] p-2 hover:bg-[#f8f3ef] rounded-xl transition-all"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
 
-            <div className="flex items-center gap-4">
-              <motion.button 
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="relative p-2 text-[#64748B] hover:text-[#0F172A] hover:bg-white/40 rounded-xl transition-all"
-              >
-                <Bell className="w-6 h-6" />
-                <motion.span 
-                  className="absolute top-1 right-1 w-2 h-2 bg-gradient-to-r from-[#FF9F1C] to-[#FF6B9D] rounded-full"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-              </motion.button>
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 p-2 hover:bg-white/40 rounded-xl transition-all"
-              >
-                <div className="w-8 h-8 bg-gradient-to-br from-[#2EC4B6] to-[#4D9DE0] rounded-full flex items-center justify-center text-white text-sm shadow-[0_0_20px_rgba(46,196,182,0.4)]">
-                  {initials}
+            {/* Breadcrumbs */}
+            <div className="flex items-center gap-2 text-sm text-[#5b403c]">
+              {showBackButton && (
+                <button
+                  onClick={() => navigate(-1)}
+                  className="mr-2 p-1 text-[#5b403c] hover:text-[#1d1b19] hover:bg-[#f8f3ef] rounded-lg transition-all"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </button>
+              )}
+              {breadcrumbs.map((crumb, index) => (
+                <div key={crumb.path} className="flex items-center gap-2">
+                  {index > 0 && <ChevronRight className="w-4 h-4 text-[#e4beb7]" />}
+                  <Link
+                    to={crumb.path}
+                    className={`hover:text-[#1d1b19] transition-colors ${
+                      index === breadcrumbs.length - 1 ? 'font-semibold text-[#1d1b19]' : ''
+                    }`}
+                  >
+                    {crumb.label}
+                  </Link>
                 </div>
-              </motion.button>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button className="p-2 text-[#5b403c] hover:text-[#1d1b19] hover:bg-[#f8f3ef] rounded-xl transition-all relative">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#b51d0d] rounded-full" />
+            </button>
+            <div className="w-8 h-8 bg-[#b51d0d] rounded-full flex items-center justify-center text-white text-xs font-semibold">
+              {initials}
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">
           <Outlet />
         </main>
-
-        {/* Floating Action Button (Mobile) */}
-        <AnimatePresence>
-          {location.pathname === '/app' && (
-            <motion.div
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0, opacity: 0 }}
-              className="fixed bottom-6 right-6 lg:hidden z-30"
-            >
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <Link
-                  to="/app/generate"
-                  className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-[#2EC4B6] via-[#4D9DE0] to-[#818CF8] rounded-full text-white shadow-[0_8px_32px_rgba(46,196,182,0.4)] hover:shadow-[0_16px_48px_rgba(46,196,182,0.5)]"
-                >
-                  <Sparkles className="w-7 h-7" />
-                </Link>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
     </div>
   );
