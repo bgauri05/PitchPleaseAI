@@ -1,6 +1,6 @@
-# BrandSetu 🚀
+# PitchPleaseAI 🚀
 
-BrandSetu is a serverless, AI-powered multi-agent automated social media content generation platform. It acts as an intelligent marketing assistant that understands a company's brand DNA, researches trends, drafts highly tailored content, automatically generates marketing images, and schedules weekly posts.
+PitchPleaseAI  is a serverless, AI-powered multi-agent automated social media content generation platform. It acts as an intelligent marketing assistant that understands a company's brand DNA, researches trends, drafts highly tailored content, automatically generates marketing images, and schedules weekly posts.
 
 ## 🌟 Key Features
 
@@ -88,7 +88,7 @@ npm run dev
 
 ## ☁️ Deployment
 
-BrandSetu is designed for AWS Serverless. We use AWS SAM for the backend and S3/CloudFront for the frontend.
+PitchPleaseAI is designed for AWS Serverless. We use AWS SAM for the backend and S3/CloudFront for the frontend.
 
 Please refer to the `DEPLOYMENT_GUIDE.md` and the `deploy.sh` script for automated zero-downtime deployment instructions.
 
