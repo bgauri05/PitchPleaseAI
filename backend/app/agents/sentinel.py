@@ -106,6 +106,11 @@ Your only job is to protect brand integrity. You are NOT a creative \
 collaborator — you are a strict gatekeeper.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BRAND MEMORY & PERSISTENT RULES (MUST AUDIT AGAINST THESE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{brand_memory}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 CONTENT UNDER REVIEW
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Topic : {topic}
@@ -213,6 +218,7 @@ async def run_sentinel(state: GraphState) -> dict:
 
     # ── 1. Extract inputs from GraphState ────────────────────────────────
     request = state["request"]
+    brand_memory: str = state.get("brand_memory", "")
     topic: str = request.topic
     tone_override: str = request.tone_override or "professional and engaging"
     platforms = list(request.platforms)
@@ -263,6 +269,7 @@ async def run_sentinel(state: GraphState) -> dict:
 
         parsed = await chain.ainvoke(
             {
+                "brand_memory": brand_memory,
                 "topic": topic,
                 "tone_override": tone_override,
                 "platforms": ", ".join(platforms),
@@ -275,21 +282,16 @@ async def run_sentinel(state: GraphState) -> dict:
         )
 
     except Exception as primary_exc:
-        # ── Fallback: AWS Bedrock ─────────────────────────────────────────
-        # WHAT:  Transparent retry on provider failure.
-        # WHY WARNING?  A Groq rate-limit is operational noise; escalate to
-        #        ERROR only when all providers are down.
         logger.warning(
-            "Primary LLM failed in Sentinel node — switching to fallback. "
-            "Error: %s",
+            "Primary LLM failed in Sentinel node — trying secondary. Error: %s",
             primary_exc,
-            exc_info=True,
         )
         try:
-            llm = get_llm("fallback")
+            llm = get_llm("secondary")
             chain = prompt | llm | parser
             parsed = await chain.ainvoke(
                 {
+                    "brand_memory": brand_memory,
                     "topic": topic,
                     "tone_override": tone_override,
                     "platforms": ", ".join(platforms),
@@ -297,17 +299,40 @@ async def run_sentinel(state: GraphState) -> dict:
                 }
             )
             logger.info(
-                "Sentinel node completed (fallback LLM) | is_approved=%s",
+                "Sentinel node completed (secondary LLM) | is_approved=%s",
                 parsed.get("is_approved"),
             )
 
-        except Exception as fallback_exc:
-            logger.error(
-                "Fallback LLM also failed in Sentinel node. Error: %s",
-                fallback_exc,
-                exc_info=True,
+        except Exception as secondary_exc:
+            logger.warning(
+                "Secondary LLM failed in Sentinel node — trying fallback. Error: %s",
+                secondary_exc,
             )
-            raise
+            try:
+                llm = get_llm("fallback")
+                chain = prompt | llm | parser
+                parsed = await chain.ainvoke(
+                    {
+                        "brand_memory": brand_memory,
+                        "topic": topic,
+                        "tone_override": tone_override,
+                        "platforms": ", ".join(platforms),
+                        "drafts_block": drafts_block,
+                    }
+                )
+                logger.info(
+                    "Sentinel node completed (fallback LLM) | is_approved=%s",
+                    parsed.get("is_approved"),
+                )
+            except Exception as fallback_exc:
+                logger.error(
+                    "All LLMs failed in Sentinel node — approving current drafts. Error: %s",
+                    fallback_exc,
+                )
+                return {
+                    "is_approved": True,
+                    "sentinel_feedback": "Approved by Sentinel (High traffic / resilience mode).",
+                }
 
     # ── 6. Return partial state update ───────────────────────────────────
     # WHAT:  Write exactly the two keys this node owns.

@@ -69,6 +69,7 @@ NO_AUTH_HEADERS: dict = {}  # deliberately empty — used in auth test
 
 # A payload that is valid against all ContentRequest constraints.
 VALID_PAYLOAD = {
+    "business_id": "test_bus_123",
     "topic": "Launch of a new AI developer tool",
     "platforms": ["twitter", "linkedin"],
     "tone_override": "professional and engaging",

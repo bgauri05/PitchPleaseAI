@@ -69,7 +69,7 @@ class Settings(BaseSettings):
     )
 
     # ── App Metadata ─────────────────────────────────────────
-    PROJECT_NAME: str = "BrandSetu API"
+    PROJECT_NAME: str = "PitchPleaseAI API"
     #   WHAT:  Human-readable project name shown in /docs title bar and
     #          health-check JSON.
     #   WHY:   Avoids hard-coding strings in multiple places.
@@ -147,6 +147,12 @@ class Settings(BaseSettings):
     #   WHERE TO GET IT:  https://huggingface.co/settings/tokens
 
 
+    # ── Meta / Instagram OAuth ─────────────────────────────
+    META_APP_ID: str = ""
+    META_APP_SECRET: str = ""
+    META_REDIRECT_URI: str = ""
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Singleton accessor
 # ─────────────────────────────────────────────────────────────────────────────
@@ -161,3 +167,7 @@ def get_settings() -> Settings:
       the Settings object is built exactly once per process lifetime.
     """
     return Settings()
+
+
+settings = get_settings()
+

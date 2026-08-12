@@ -1,6 +1,5 @@
 import { createBrowserRouter } from "react-router";
 import { LandingPage } from "./pages/LandingPage";
-import { AuthPage } from "./pages/AuthPage";
 import { BusinessSetup } from "./pages/BusinessSetup";
 import { Dashboard } from "./pages/Dashboard";
 import { ContentGenerator } from "./pages/ContentGenerator";
@@ -14,11 +13,11 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 export const router = createBrowserRouter([
   {
     path: "/",
-    Component: LandingPage,
+    Component: BusinessSetup,
   },
   {
-    path: "/auth",
-    Component: AuthPage,
+    path: "/landing",
+    Component: LandingPage,
   },
   {
     path: "/setup",

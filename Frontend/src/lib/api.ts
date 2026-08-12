@@ -22,6 +22,8 @@ export type BackendPlatform = 'linkedin' | 'twitter' | 'instagram';
 
 /** Request body sent to POST /content/generate */
 export interface ContentRequest {
+    /** Unique business identifier for brand memory context. */
+    business_id: string;
     /** The marketing topic or brief (max 500 chars on the backend). */
     topic: string;
     /** Platforms to generate copy for — must use the backend's lowercase keys. */
@@ -141,5 +143,22 @@ export const apiClient = {
         }
 
         return response.json() as Promise<ImageGenerationResponse>;
+    },
+
+    /**
+     * Save or update business Brand Memory profile.
+     */
+    async setupBusiness(payload: Record<string, any>): Promise<any> {
+        const response = await fetch(`${API_URL}/business/setup`, {
+            method: "POST",
+            headers: defaultHeaders,
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            await handleErrorResponse(response);
+        }
+
+        return response.json();
     },
 };

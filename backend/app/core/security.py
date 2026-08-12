@@ -121,7 +121,6 @@ async def verify_api_key(
     # ── Step 1: extract the expected key from Settings ───────
     expected_key: str = settings.API_KEY.get_secret_value()
 
-    # ── Step 2: reject missing header ────────────────────────
     if not api_key:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -129,9 +128,6 @@ async def verify_api_key(
         )
 
     # ── Step 3: constant-time comparison ─────────────────────
-    #   WHY `.encode()`:  compare_digest requires bytes-like objects.
-    #   WHY constant-time: prevents timing side-channel attacks (see
-    #   module docstring — SECURITY HIGHLIGHT #2).
     keys_match: bool = secrets.compare_digest(
         api_key.encode("utf-8"),
         expected_key.encode("utf-8"),

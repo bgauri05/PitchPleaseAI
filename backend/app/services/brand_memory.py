@@ -144,184 +144,172 @@ def get_vector_store() -> SupabaseVectorStore:
 # ─────────────────────────────────────────────────────────────────────────────
 
 async def add_brand_guideline(
+    business_id: str,
     content: str,
     metadata: Optional[Dict] = None,
 ) -> bool:
-    """Embed and persist a brand guideline or past post into the vector store.
-
-    Parameters
-    ----------
-    content : str
-        The raw text to embed and store — brand rules, tone-of-voice
-        examples, or high-performing past social-media posts.
-    metadata : dict, optional
-        Arbitrary key/value pairs stored alongside the vector, e.g.:
-          {"source": "brand_guide_v3", "platform": "linkedin", "year": 2025}
-        Stored in the `metadata JSONB` column; returned alongside documents
-        on retrieval so agents can filter or cite sources.
-
-    Returns
-    -------
-    bool
-        True on successful insertion; False if an exception occurred
-        (logged at ERROR level — caller can decide how to handle).
-
-    WHAT is happening internally?
-        1. `get_vector_store()` connects to Supabase.
-        2. `add_texts([content], metadatas=[metadata])` calls the embedding
-           model to produce a 384-dim vector, then POSTs both the raw text
-           and the vector to Supabase via the REST API.
-        3. pgvector stores the vector in the `embedding VECTOR(384)` column.
-
-    WHY async?
-        The Supabase REST call is I/O-bound.  Marking the function `async`
-        lets FastAPI / LangGraph await it without blocking the event loop,
-        keeping the API responsive during bulk guideline ingestion.
-
-    NOTE: `SupabaseVectorStore.add_texts()` is currently synchronous in
-        LangChain community.  We call it in an executor-friendly way; future
-        versions of langchain-community may add native async support.
-    """
+    """Embed and persist a brand guideline, scoped to a specific business."""
     try:
-        vector_store = get_vector_store()
+        client = get_supabase_client()
 
-        # WHAT:  `add_texts` accepts a list of strings and an optional list
-        #        of metadata dicts (one per text).  We wrap single inputs
-        #        in lists to match the API.
-        # HOW:   Internally, LangChain batches the embedding calls, then
-        #        POSTs to Supabase's REST API to insert rows.
-        vector_store.add_texts(
-            texts=[content],
-            metadatas=[metadata or {}],
-        )
+        # Embed the text directly (384-dim vector), bypassing the LangChain
+        # wrapper here — SupabaseVectorStore.add_texts() only knows about
+        # content/metadata/embedding columns, not our added business_id
+        # column, so it can't satisfy the NOT NULL constraint we added.
+        vector = embeddings.embed_query(content)
+
+        client.table("brand_memory").insert({
+            "business_id": business_id,
+            "content": content,
+            "metadata": metadata or {},
+            "embedding": vector,
+        }).execute()
 
         logger.info(
-            "Brand guideline stored successfully | chars=%d metadata=%s",
-            len(content),
-            metadata,
+            "Brand guideline stored | business_id=%s chars=%d",
+            business_id, len(content),
         )
         return True
 
     except Exception as exc:
-        logger.error(
-            "Failed to store brand guideline | error=%s", exc, exc_info=True
-        )
+        logger.error("Failed to store brand guideline | error=%s", exc, exc_info=True)
         return False
 
-
-async def retrieve_brand_context(query: str, k: int = 3) -> str:
-    """Retrieve the most semantically relevant brand guidelines for a query.
-
-    Parameters
-    ----------
-    query : str
-        The search query — typically the content `topic` from the user's
-        `ContentRequest`.  The function embeds this query and returns the
-        `k` most similar documents from the brand_memory table.
-    k : int, default 3
-        Number of documents to retrieve.  3 is a sensible default:
-          • Enough context for rich brand alignment.
-          • Small enough to stay well within LLM context-window limits.
-
-    Returns
-    -------
-    str
-        A Markdown-formatted string combining the content of all retrieved
-        documents, ready to be injected directly into `GraphState` or an
-        LLM prompt.  Returns an empty string if no documents are found or
-        if an error occurs (logged separately).
-
-    HOW — Retrieval pipeline (direct RPC, bypasses LangChain vector store)
-        1. `query` is embedded directly via the module-level MiniLM model.
-        2. We call the `match_brand_memory` SQL RPC function directly on the
-           Supabase client, avoiding the LangChain SupabaseVectorStore wrapper
-           that triggers the `AttributeError: 'SyncRPCFilterRequestBuilder'
-           object has no attribute 'params'` bug on mismatched library
-           versions.
-        3. pgvector computes cosine distance between the query vector and
-           every row's `embedding` column, returning the `k` closest rows.
-        4. Each row comes back as a plain dict with `content` and `metadata`
-           keys (as defined by the SQL function's RETURNS TABLE).
-        5. We join the content values with Markdown separators so the
-           resulting string reads naturally when injected into prompts.
-
-    WHY return Markdown (not a list of Documents)?
-        LangGraph state values are plain Python types — strings, dicts, etc.
-        A Markdown string can be stored in `GraphState["research_context"]`
-        and injected verbatim into the Creator / Researcher prompts without
-        any further formatting logic in the agent nodes.
-    """
+async def get_business_profile(business_id: str) -> Optional[Dict]:
+    """Fetch structured business attributes from businesses table."""
     try:
-        # Step 1 — embed the query directly with the module-level MiniLM model.
-        # WHAT:  Produces a 384-dim float list matching the `VECTOR(384)` column.
-        # WHY not go through SupabaseVectorStore?  The LangChain wrapper calls
-        #        `.params` on the Supabase filter builder object, which no longer
-        #        exists in newer versions of `supabase-py`, causing an
-        #        AttributeError at runtime.  Calling embed_query() + rpc()
-        #        directly avoids the broken code path entirely.
+        res = get_supabase_client().table("businesses").select("*").eq("id", business_id).execute()
+        if res.data and len(res.data) > 0:
+            return res.data[0]
+    except Exception as exc:
+        logger.warning("Could not fetch business profile for business_id=%s | %s", business_id, exc)
+    return None
+
+
+async def upsert_business_profile(payload: Dict) -> Optional[Dict]:
+    """Create or update a Business Brand Memory profile in Supabase table."""
+    try:
+        res = get_supabase_client().table("businesses").upsert(payload).execute()
+        if res.data and len(res.data) > 0:
+            return res.data[0]
+        return payload
+    except Exception as exc:
+        logger.error("Failed to upsert business profile | error=%s", exc, exc_info=True)
+        return payload
+
+
+async def update_business_profile(business_id: str, updates: Dict) -> Optional[Dict]:
+    """Update specific fields of an existing Business Brand Memory profile."""
+    try:
+        updates["updated_at"] = "now()"
+        res = get_supabase_client().table("businesses").update(updates).eq("id", business_id).execute()
+        if res.data and len(res.data) > 0:
+            return res.data[0]
+        return await get_business_profile(business_id)
+    except Exception as exc:
+        logger.error("Failed to update business profile for business_id=%s | error=%s", business_id, exc, exc_info=True)
+        return None
+
+
+
+async def retrieve_brand_context(query: str, business_id: str, k: int = 3) -> str:
+    """Retrieve the complete Brand Memory (structured profile + vector guidelines) for a query.
+
+    Combines:
+      1. Structured Brand Memory profile (Business Info, Brand Voice, Brand Values,
+         Target Audience, Products/Services, and Custom AI Instructions).
+      2. Semantic vector search snippets from pgvector `brand_memory` table.
+    """
+    sections: List[str] = []
+
+    # Step 0 — Fetch structured Business Brand Memory profile
+    profile = await get_business_profile(business_id)
+    if profile:
+        name = profile.get("business_name") or profile.get("name") or "Business"
+        industry = profile.get("industry") or "General"
+        desc = profile.get("business_description") or ""
+
+        # Voice & Values formatting
+        voice_val = profile.get("brand_voice")
+        if isinstance(voice_val, list):
+            voice_str = ", ".join(voice_val)
+        else:
+            voice_str = str(voice_val) if voice_val else profile.get("tone", "Professional")
+
+        values_val = profile.get("brand_values")
+        if isinstance(values_val, list):
+            values_str = ", ".join(values_val)
+        else:
+            values_str = str(values_val) if values_val else ""
+
+        audience = profile.get("target_audience") or ""
+        products = profile.get("products_services") or ""
+        ai_instructions = profile.get("ai_instructions") or ""
+
+        profile_lines = [
+            "## 🏢 Core Brand Identity & Memory",
+            f"- **Business Name**: {name}",
+            f"- **Industry**: {industry}",
+        ]
+        if desc:
+            profile_lines.append(f"- **Business Description**: {desc}")
+        if voice_str:
+            profile_lines.append(f"- **Brand Voice**: {voice_str}")
+        if values_str:
+            profile_lines.append(f"- **Brand Values**: {values_str}")
+        if audience:
+            profile_lines.append(f"- **Target Audience**: {audience}")
+        if products:
+            profile_lines.append(f"- **Products / Services**: {products}")
+        if ai_instructions:
+            profile_lines.append(
+                f"\n⚠️ **PERSISTENT AI INSTRUCTIONS (MUST ALWAYS FOLLOW)**:\n{ai_instructions}"
+            )
+
+        sections.append("\n".join(profile_lines))
+
+    try:
+        # Step 1 — Embed query directly with MiniLM
         query_embedding: List[float] = embeddings.embed_query(query)
 
-        # Step 2 — call the Supabase RPC function directly.
-        # WHAT:  `match_brand_memory` is a SQL function that accepts the query
-        #        vector and a row-count limit, then returns ranked rows via
-        #        cosine similarity (see module docstring for the DDL).
-        # HOW:   `.rpc(fn, params).execute()` posts to
-        #        /rest/v1/rpc/match_brand_memory and returns an APIResponse
-        #        whose `.data` attribute is a list of dicts.
+        # Step 2 — Call Supabase RPC function for similarity search
         response = (
             get_supabase_client()
             .rpc(
                 "match_brand_memory",
-                {"query_embedding": query_embedding, "match_count": k},
+                {
+                    "query_embedding": query_embedding,
+                    "match_count": k,
+                    "filter_business_id": business_id,
+                },
             )
             .execute()
         )
 
         rows = response.data or []
-
-        if not rows:
-            logger.info(
-                "No brand memory documents found for query=%r", query
-            )
-            return ""
-
-        # Step 3 — format the retrieved rows into a cohesive Markdown block.
-        # WHAT:  Each row dict has at minimum `content` (str) and `metadata`
-        #        (dict) keys as declared in the SQL RETURNS TABLE clause.
-        # HOW:   Each document becomes a numbered section under a heading.
-        #        We include the metadata source (if present) as a citation,
-        #        then the raw content so agents can read it as a brief.
-        # WHY Markdown?  The Creator and Researcher system prompts are already
-        #        Markdown-rich; consistent formatting helps LLMs parse
-        #        section boundaries correctly.
-        sections: List[str] = []
-        for i, row in enumerate(rows, start=1):
-            metadata: Dict = row.get("metadata") or {}
-            source: str = metadata.get("source", f"guideline-{i}")
-            content: str = (row.get("content") or "").strip()
-            sections.append(
-                f"### Brand Memory [{i}] — {source}\n\n"
-                f"{content}"
-            )
+        if rows:
+            memory_sections: List[str] = []
+            for i, row in enumerate(rows, start=1):
+                metadata: Dict = row.get("metadata") or {}
+                source: str = metadata.get("source", f"guideline-{i}")
+                content: str = (row.get("content") or "").strip()
+                memory_sections.append(
+                    f"### Brand Guideline [{i}] — {source}\n{content}"
+                )
+            sections.append("## 📚 Vector Brand Knowledge\n" + "\n\n".join(memory_sections))
 
         context = "\n\n---\n\n".join(sections)
-
         logger.info(
-            "Retrieved %d brand memory docs for query=%r | total_chars=%d",
-            len(rows),
-            query,
-            len(context),
+            "Retrieved brand memory for business_id=%s query=%r | chars=%d",
+            business_id, query, len(context),
         )
         return context
 
     except Exception as exc:
         logger.error(
-            "Failed to retrieve brand context | query=%r error=%s",
-            query,
-            exc,
-            exc_info=True,
+            "Failed to retrieve vector brand context | query=%r error=%s",
+            query, exc, exc_info=True,
         )
-        # Return empty string so agents degrade gracefully rather than
-        # crashing when the vector store is unavailable.
-        return ""
+        return "\n\n---\n\n".join(sections) if sections else ""
+
 

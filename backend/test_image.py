@@ -3,7 +3,7 @@ import base64
 
 # The API endpoint you just built
 url = "http://localhost:8000/api/v1/content/generate-image"
-
+cd backedcd 
 # The security headers
 headers = {
     "X-API-Key": "hackathon_super_secret_key",

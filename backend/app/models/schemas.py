@@ -93,6 +93,12 @@ class ContentRequest(BaseModel):
     # ── SECURITY: reject any undeclared JSON keys immediately ────────────
     model_config = {"extra": "forbid"}
 
+    # ── business_id ──────────────────────────────────────────────────────
+    business_id: Optional[str] = Field(
+        default="default_business_id",
+        description="UUID of the business this content is being generated for.",
+    )
+
     # ── topic ────────────────────────────────────────────────────────────
     #   WHAT:  The subject the user wants content about.
     #   VALIDATION:
@@ -191,3 +197,91 @@ class ContentResponse(BaseModel):
         ge=0,
         description="Total Creator ↔ Sentinel revision loops executed.",
     )
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Business / Brand Memory Setup DTO
+# ──────────────────────────────────────────────────────────────────────────────
+
+class BusinessSetupRequest(BaseModel):
+    """Incoming payload for creating/updating a Business Brand Memory profile."""
+
+    business_id: Optional[str] = Field(
+        default=None,
+        description="Optional UUID of existing business to update.",
+    )
+    business_name: Optional[str] = Field(
+        default=None,
+        description="Name of the business.",
+    )
+    name: Optional[str] = Field(
+        default=None,
+        description="Legacy field alias for business_name.",
+    )
+    industry: str = Field(
+        ...,
+        description="Business industry or category.",
+    )
+    business_description: Optional[str] = Field(
+        default="",
+        max_length=1000,
+        description="2-3 line description of the business.",
+    )
+    brand_voice: List[str] = Field(
+        default_factory=list,
+        description="List of selected brand voice traits (e.g. Friendly, Luxury, Bold).",
+    )
+    brand_values: List[str] = Field(
+        default_factory=list,
+        max_length=5,
+        description="List of up to 5 core brand values (e.g. Trust, Sustainability).",
+    )
+    target_audience: str = Field(
+        default="",
+        max_length=1000,
+        description="Description of target audience.",
+    )
+    products_services: str = Field(
+        default="",
+        max_length=1000,
+        description="Description of products or services offered.",
+    )
+    logo_url: Optional[str] = Field(
+        default=None,
+        description="URL or file path to brand logo image.",
+    )
+    brand_images: List[str] = Field(
+        default_factory=list,
+        description="List of URLs or paths for 3-5 product/service images.",
+    )
+    ai_instructions: Optional[str] = Field(
+        default="",
+        max_length=1000,
+        description="Persistent custom instructions for AI content generation.",
+    )
+    tone: Optional[str] = Field(
+        default=None,
+        description="Legacy single tone string for backward compatibility.",
+    )
+
+
+class BusinessProfileResponse(BaseModel):
+    """Response payload containing complete Business Brand Memory profile."""
+
+    id: str = Field(..., description="UUID of the business.")
+    business_name: str = Field(..., description="Name of the business.")
+    name: Optional[str] = Field(default=None, description="Legacy alias for business_name.")
+    industry: Optional[str] = Field(default="", description="Industry or category.")
+    business_description: Optional[str] = Field(default="", description="2-3 line description.")
+    brand_voice: List[str] = Field(default_factory=list, description="Array of voice traits.")
+    brand_values: List[str] = Field(default_factory=list, description="Array of up to 5 brand values.")
+    target_audience: Optional[str] = Field(default="", description="Target audience description.")
+    products_services: Optional[str] = Field(default="", description="Products / services description.")
+    logo_url: Optional[str] = Field(default=None, description="Brand logo image URL.")
+    brand_images: List[str] = Field(default_factory=list, description="Array of product/service image URLs.")
+    ai_instructions: Optional[str] = Field(default="", description="Persistent AI instructions.")
+    tone: Optional[str] = Field(default=None, description="Legacy tone string.")
+    created_at: Optional[str] = Field(default=None, description="Creation timestamp.")
+    updated_at: Optional[str] = Field(default=None, description="Last update timestamp.")
+
+

@@ -87,6 +87,12 @@ class GraphState(TypedDict, total=False):
     #          when the research is injected into the Creator's prompt.
     research_context: str
 
+    # ── Brand Memory ─────────────────────────────────────────────────────
+    #   WHAT:  Formated Brand Memory profile (voice, values, target audience,
+    #          products/services, persistent AI instructions) retrieved from
+    #          Supabase/vector store for the business.
+    brand_memory: str
+
     # ── Creator output ───────────────────────────────────────────────────
     #   WHAT:  A dict mapping each requested platform to the current draft
     #          text (e.g. {"linkedin": "…", "twitter": "…"}).

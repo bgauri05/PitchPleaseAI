@@ -5,12 +5,14 @@ import {
   Loader2, ImageIcon, AlertCircle,
 } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router';
 import html2canvas from 'html2canvas-pro';
 import { apiClient } from '@/lib/api';
 import type { PlatformDraft, BackendPlatform } from '@/lib/api';
 import { saveGeneratedContent } from '@/lib/content';
 
 export function ContentGenerator() {
+  const navigate = useNavigate();
   const posterRef = useRef<HTMLDivElement>(null);
 
   // ── UI selection state ──────────────────────────────────────────────────
@@ -75,6 +77,13 @@ export function ContentGenerator() {
   const handleGenerate = async () => {
     if (!goal) return;
 
+    const businessId = localStorage.getItem('business_id');
+    if (!businessId) {
+      alert('Please complete business setup first.');
+      navigate('/setup');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setGeneratedData(null);
@@ -89,6 +98,7 @@ export function ContentGenerator() {
           : '';
 
       const response = await apiClient.generateContent({
+        business_id: businessId,
         // Use the detailed description as the topic; fall back to the goal.
         // Backend key names must be lowercase literals (schema is strict).
         topic: `${languagePrefix}${topic.trim() || goal}`,

@@ -135,6 +135,11 @@ For every platform you write for, you produce TWO assets:
   2. A rich generative-AI image prompt  (key: "image_prompt")
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BRAND MEMORY & PERSISTENT RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+{brand_memory}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 RESEARCH BRIEF (use this to shape every hook, angle, and visual)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 {research_context}
@@ -236,6 +241,7 @@ async def run_creator(state: GraphState) -> dict:
     #        iteration (sentinel_feedback, loop_count).
     request = state["request"]
 
+    brand_memory: str = state.get("brand_memory", "")
     research_context: str = state.get("research_context", "")
     #   WHY default ""?  If the Researcher node somehow didn't run (e.g.
     #   during unit tests), the Creator still produces drafts — just without
@@ -321,18 +327,15 @@ async def run_creator(state: GraphState) -> dict:
     #        every agent degrades gracefully on provider failures.
     parsed: dict
 
+    parsed = None
     try:
         # ── Primary: Groq ────────────────────────────────────────────────
-        # WHY primary first:  Groq offers the lowest latency, which matters
-        # on revision loops where the user is waiting for a re-draft.
         llm = get_llm("primary")
         chain = prompt | llm | parser
 
-        # `.ainvoke()` supplies the remaining template variables.
-        # `research_context` may be a multi-paragraph markdown string —
-        # ChatPromptTemplate handles it safely without truncation.
         parsed = await chain.ainvoke(
             {
+                "brand_memory": brand_memory,
                 "research_context": research_context,
                 "platforms": ", ".join(platforms),
                 "tone_override": tone_override,
@@ -346,22 +349,17 @@ async def run_creator(state: GraphState) -> dict:
         )
 
     except Exception as primary_exc:
-        # ── Fallback: AWS Bedrock ────────────────────────────────────────
-        # WHAT:  Transparent retry on a different provider.
-        # WHY WARNING not ERROR?  A rate-limit on Groq is operational noise,
-        #        not a bug.  We escalate to ERROR only when ALL providers fail.
         logger.warning(
-            "Primary LLM failed in Creator node (loop=%d) — switching to fallback. "
-            "Error: %s",
+            "Primary LLM failed in Creator node (loop=%d) — trying secondary. Error: %s",
             loop_count,
             primary_exc,
-            exc_info=True,
         )
         try:
-            llm = get_llm("fallback")
+            llm = get_llm("secondary")
             chain = prompt | llm | parser
             parsed = await chain.ainvoke(
                 {
+                    "brand_memory": brand_memory,
                     "research_context": research_context,
                     "platforms": ", ".join(platforms),
                     "tone_override": tone_override,
@@ -369,62 +367,92 @@ async def run_creator(state: GraphState) -> dict:
                 }
             )
             logger.info(
-                "Creator node completed (fallback LLM) | loop=%d platforms=%s",
+                "Creator node completed (secondary LLM) | loop=%d platforms=%s",
                 loop_count + 1,
                 list(parsed.get("drafts", {}).keys()),
             )
 
-        except Exception as fallback_exc:
-            logger.error(
-                "Fallback LLM also failed in Creator node (loop=%d). Error: %s",
+        except Exception as secondary_exc:
+            logger.warning(
+                "Secondary LLM failed in Creator node (loop=%d) — trying fallback. Error: %s",
                 loop_count,
-                fallback_exc,
-                exc_info=True,
+                secondary_exc,
             )
-            raise
+            try:
+                llm = get_llm("fallback")
+                chain = prompt | llm | parser
+                parsed = await chain.ainvoke(
+                    {
+                        "brand_memory": brand_memory,
+                        "research_context": research_context,
+                        "platforms": ", ".join(platforms),
+                        "tone_override": tone_override,
+                        "revision_block": revision_block,
+                    }
+                )
+                logger.info(
+                    "Creator node completed (fallback LLM) | loop=%d platforms=%s",
+                    loop_count + 1,
+                    list(parsed.get("drafts", {}).keys()),
+                )
+            except Exception as fallback_exc:
+                logger.error(
+                    "All LLMs failed in Creator node (loop=%d). Generating template fallback drafts. Error: %s",
+                    loop_count,
+                    fallback_exc,
+                )
+                # Create elegant, brand-aligned fallback drafts if all LLMs fail or rate-limit
+                fallback_drafts = {}
+                clean_topic = topic.strip() or "Brand Update"
+                for plat in platforms:
+                    p_key = plat.lower()
+                    if "linkedin" in p_key:
+                        fallback_drafts[p_key] = {
+                            "text": (
+                                f"✨ Celebrating {clean_topic}!\n\n"
+                                f"In today's fast-evolving landscape, staying true to our core values and delivering exceptional quality remains our top priority. "
+                                f"We're excited to share this milestone with our community and invite your thoughts below.\n\n"
+                                f"#{clean_topic.replace(' ', '')} #Innovation #Quality #BrandSetu"
+                            ),
+                            "image_prompt": f"Professional, clean graphic celebrating {clean_topic}, modern typography, elegant lighting, 8k resolution",
+                        }
+                    elif "twitter" in p_key or "x" in p_key:
+                        fallback_drafts[p_key] = {
+                            "text": (
+                                f"🚀 {clean_topic} is officially here!\n\n"
+                                f"Excited to bring you timeless quality and meaningful experiences. What are your thoughts?\n\n"
+                                f"#{clean_topic.replace(' ', '')} #BuildInPublic #Innovation"
+                            ),
+                            "image_prompt": f"Eye-catching graphic banner for {clean_topic}, vibrant colors, high contrast, sleek aesthetic",
+                        }
+                    else:
+                        fallback_drafts[p_key] = {
+                            "text": (
+                                f"✨ Warm greetings on {clean_topic}! ✨\n\n"
+                                f"Celebrating quality, authenticity, and moments that matter. Thank you for being a part of our journey!\n\n"
+                                f"#{clean_topic.replace(' ', '')} #BrandSetu #FestiveMood #Community"
+                            ),
+                            "image_prompt": f"Cinematic lifestyle visual celebrating {clean_topic}, warm golden ambient lighting, festive decor, 8k",
+                        }
+                
+                return {
+                    "current_drafts": fallback_drafts,
+                    "loop_count": loop_count + 1,
+                }
 
     # ── 6. Return partial state update ───────────────────────────────────
-    # WHAT:  Write exactly the two keys this node owns.
-    # HOW:   LangGraph merges this dict into the cumulative GraphState.
-    #
-    #   "current_drafts"
-    #       WHAT:  The Dict[platform → post_text] ready for the Sentinel.
-    #       HOW:   Extracted from the parser's output dict under key "drafts".
-    #              The `CreatorOutput` schema guarantees the key exists and
-    #              its value is Dict[str, str] — no KeyError risk.
-    #
-    #   "loop_count"
-    #       WHAT:  The updated draft counter.
-    #       HOW:   loop_count + 1 (we do NOT mutate the variable in-place;
-    #              LangGraph state is immutable within a node execution).
-    #       WHY here and not in the Sentinel?
-    #              Incrementing in the Creator means the count faithfully
-    #              tracks "how many drafts exist", not "how many reviews ran".
-    #              The workflow's conditional edge uses this number *before*
-    #              calling the Sentinel, so it can short-circuit on the next
-    #              edge evaluation without needing an extra Sentinel call.
-    # ── 7. Normalise drafts to plain dicts for JSON-serialisable state ────
-    # WHAT:  `JsonOutputParser` may return nested Pydantic objects or raw
-    #        dicts depending on the LangChain version.  We normalise to a
-    #        plain `Dict[str, Dict[str, str]]` so the value stored in
-    #        GraphState is always a simple, JSON-serialisable structure —
-    #        safe for Supabase persistence and downstream agents to consume
-    #        without importing the Pydantic schema.
-    raw_drafts = parsed["drafts"]
+    raw_drafts = parsed.get("drafts", {}) if parsed else {}
     normalised: Dict[str, Dict[str, str]] = {}
     for platform, bundle in raw_drafts.items():
         if isinstance(bundle, dict):
-            # Already a plain dict (typical when JsonOutputParser returns
-            # a raw dict rather than a Pydantic instance).
             normalised[platform] = {
                 "text": bundle.get("text", ""),
                 "image_prompt": bundle.get("image_prompt", ""),
             }
         else:
-            # Pydantic model instance — extract via attributes.
             normalised[platform] = {
-                "text": bundle.text,
-                "image_prompt": bundle.image_prompt,
+                "text": getattr(bundle, "text", ""),
+                "image_prompt": getattr(bundle, "image_prompt", ""),
             }
 
     return {

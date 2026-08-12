@@ -29,6 +29,7 @@ WHY two providers?
 """
 
 from __future__ import annotations
+import os
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_groq import ChatGroq        # pip install langchain-groq
@@ -47,39 +48,22 @@ def get_llm(model_role: str = "primary") -> BaseChatModel:
     Parameters
     ----------
     model_role : str, default "primary"
-        • ``"primary"``  → Groq  (Llama-3.3-70B, temperature 0.7)
-        • ``"fallback"`` → AWS Bedrock  (Claude 3 Haiku)
+        • ``"primary"``   → Groq  (Llama-3.3-70B, temperature 0.7)
+        • ``"secondary"`` → Groq  (Llama-3.1-8B-instant, temperature 0.7)
+        • ``"fallback"``  → AWS Bedrock (Claude 3 Haiku) or Secondary Groq fallback
 
     Returns
     -------
     BaseChatModel
         A LangChain-compatible chat model ready to be plugged into any
         chain, agent, or LangGraph node.
-
-    Raises
-    ------
-    ValueError
-        If an unrecognised ``model_role`` is supplied.
-
-    Why a factory?
-        LangGraph agent nodes don't need to know *which* provider they're
-        talking to.  They just call ``get_llm()`` (or ``get_llm("fallback")``)
-        and receive a model that satisfies the BaseChatModel interface.
-        If Groq rate-limits us, we can seamlessly swap to Bedrock by
-        changing one argument — zero prompt or chain rewiring required.
     """
 
     # ── Load validated settings (singleton, cached) ──────────
     settings = get_settings()
 
-    # ── PRIMARY: Groq ────────────────────────────────────────
+    # ── PRIMARY: Groq Llama-3.3-70B ──────────────────────────
     if model_role == "primary":
-        # WHAT:  Instantiate the Groq-hosted Llama-3.3-70B model.
-        # HOW:   The API key is stored as a Pydantic `SecretStr` in Settings.
-        #        `.get_secret_value()` extracts the raw string at the last
-        #        possible moment, so the key never appears in logs or repr().
-        # WHY 0.7 temperature:  Gives the content-generation agents enough
-        #        creativity for marketing copy while keeping outputs coherent.
         return ChatGroq(
             api_key=settings.GROQ_API_KEY.get_secret_value(),
             model=settings.DEFAULT_GROQ_MODEL,       # "llama-3.3-70b-versatile"
@@ -87,38 +71,42 @@ def get_llm(model_role: str = "primary") -> BaseChatModel:
             max_tokens=settings.LLM_MAX_TOKENS,       # 4096 by default
         )
 
-    # ── FALLBACK: AWS Bedrock ────────────────────────────────
+    # ── SECONDARY: Groq Llama-3.1-8B ─────────────────────────
+    if model_role in ("secondary", "fallback_groq"):
+        return ChatGroq(
+            api_key=settings.GROQ_API_KEY.get_secret_value(),
+            model="llama-3.1-8b-instant",
+            temperature=0.7,
+            max_tokens=settings.LLM_MAX_TOKENS,
+        )
+
+    # ── FALLBACK: AWS Bedrock or Secondary Groq ───────────────
     if model_role == "fallback":
-        # WHAT:  Instantiate an AWS Bedrock-hosted model as a resilience
-        #        fallback when the primary Groq endpoint is unavailable or
-        #        rate-limited.
-        #
-        # MODEL CHOICE:
-        #   Using "anthropic.claude-3-haiku-20240307-v1:0" — the fastest
-        #   and most cost-effective Claude 3 variant on Bedrock.
-        #   Alternative: "amazon.titan-text-express-v1" if you prefer a
-        #   first-party AWS model with no additional EULA.
-        #
-        # AWS CREDENTIALS:
-        #   ChatBedrock relies on boto3's default credential chain:
-        #     1. Environment variables  (AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY)
-        #     2. Shared credential file (~/.aws/credentials)
-        #     3. IAM instance role (EC2 / ECS / Lambda)
-        #   In production, prefer IAM Roles so no long-lived keys exist.
-        #   For local development, our Settings class loads the keys from
-        #   .env into the process environment, where boto3 picks them up
-        #   implicitly — no need to pass them to ChatBedrock explicitly.
-        return ChatBedrock(
-            model_id="anthropic.claude-3-haiku-20240307-v1:0",
-            region_name=settings.AWS_DEFAULT_REGION,       # "us-east-1"
-            model_kwargs={
-                "temperature": 0.7,
-                "max_tokens": settings.LLM_MAX_TOKENS,     # 4096
-            },
-            credentials_profile_name=None,  # None → use env vars / IAM role
+        aws_key = os.getenv("AWS_ACCESS_KEY_ID", getattr(settings, "AWS_ACCESS_KEY_ID", ""))
+        # Check if AWS credentials are valid and not placeholder
+        if aws_key and "placeholder" not in aws_key.lower() and len(aws_key) > 5:
+            try:
+                return ChatBedrock(
+                    model_id="anthropic.claude-3-haiku-20240307-v1:0",
+                    region_name=settings.AWS_DEFAULT_REGION,
+                    model_kwargs={
+                        "temperature": 0.7,
+                        "max_tokens": settings.LLM_MAX_TOKENS,
+                    },
+                    credentials_profile_name=None,
+                )
+            except Exception:
+                pass
+
+        # Default resilient fallback: secondary Groq model
+        return ChatGroq(
+            api_key=settings.GROQ_API_KEY.get_secret_value(),
+            model="llama-3.1-8b-instant",
+            temperature=0.7,
+            max_tokens=settings.LLM_MAX_TOKENS,
         )
 
     # ── Unknown role ─────────────────────────────────────────
     raise ValueError(
-        f"Unknown model_role '{model_role}'. Expected 'primary' or 'fallback'."
+        f"Unknown model_role '{model_role}'. Expected 'primary', 'secondary', or 'fallback'."
     )

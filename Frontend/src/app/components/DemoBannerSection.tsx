@@ -44,7 +44,7 @@ export function DemoBannerSection() {
               <div>
                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="inline-block">
                   <Link
-                    to="/auth"
+                    to="/setup"
                     className="bg-[#b51d0d] hover:bg-[#d83824] text-white px-8 py-4 rounded-xl font-bold text-base shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center gap-3"
                   >
                     <span>Start Free Today</span>

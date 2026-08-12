@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import content, health
+from app.api.v1.endpoints import business, content, health, instagram, schedule
 
 # WHAT:  The single router object imported by main.py.
 # HOW:   main.py calls `app.include_router(api_router, prefix=settings.API_V1_STR)`
@@ -39,4 +39,28 @@ api_router.include_router(
     content.router,
     prefix="/content",
     tags=["Content Generation"],
+)
+
+# ── Business setup endpoints ──────────────────────────────────────────
+# Final path: POST /api/v1/business/setup
+api_router.include_router(
+    business.router,
+    prefix="/business",
+    tags=["Business Setup"],
+)
+
+# ── Instagram OAuth endpoints ─────────────────────────────────────────
+# Final path: GET /api/v1/instagram/connect & GET /api/v1/instagram/callback
+api_router.include_router(
+    instagram.router,
+    prefix="/instagram",
+    tags=["Instagram"],
+)
+
+# ── Schedule endpoints ────────────────────────────────────────────────
+# Final path: POST /api/v1/schedule & GET /api/v1/schedule
+api_router.include_router(
+    schedule.router,
+    prefix="/schedule",
+    tags=["Schedule"],
 )

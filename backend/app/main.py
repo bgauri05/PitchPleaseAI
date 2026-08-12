@@ -52,6 +52,7 @@ from mangum import Mangum
 
 from app.core.config import get_settings
 from app.api.v1.router import api_router
+from app.services.scheduler import start_scheduler, stop_scheduler
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -73,11 +74,13 @@ async def lifespan(app: FastAPI):
     """
     settings = get_settings()
     # --- startup ---
-    print(f"🚀  {settings.PROJECT_NAME} v{settings.APP_VERSION} starting "
+    print(f"[START] {settings.PROJECT_NAME} v{settings.APP_VERSION} starting "
           f"[env={settings.ENVIRONMENT}] …")
+    start_scheduler()
     yield
     # --- shutdown ---
-    print("🛑  Shutting down …")
+    stop_scheduler()
+    print("[SHUTDOWN] Shutting down …")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -134,6 +137,14 @@ def create_app() -> FastAPI:
     #    All v1 routes live under /api/v1/…
     app.include_router(api_router, prefix=settings.API_V1_STR)
 
+    # ── Static uploads directory ─────────────────────────────
+    import os
+    from fastapi.staticfiles import StaticFiles
+    uploads_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "uploads")
+    os.makedirs(uploads_dir, exist_ok=True)
+    app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+
+
     # ── Root health-check endpoint ───────────────────────────
     #    WHAT:  A minimal GET / that returns {"status": "alive"}.
     #    WHY:   Load balancers, Docker HEALTHCHECK, and uptime monitors
@@ -143,14 +154,15 @@ def create_app() -> FastAPI:
     @app.get(
         "/",
         tags=["health"],
-        summary="Root health check — verify the API is alive",
+        summary="Root health check — verify the API is running",
     )
     async def root_health_check():
         return {
-            "status": "alive",
+            "status": "healthy",
             "project": settings.PROJECT_NAME,
             "version": settings.APP_VERSION,
             "environment": settings.ENVIRONMENT,
+            "docs": "/docs",
         }
 
     return app

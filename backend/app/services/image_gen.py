@@ -45,6 +45,8 @@ logger = logging.getLogger(__name__)
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
+import urllib.parse
+
 _HF_API_URL = (
     "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell"
 )
@@ -55,101 +57,55 @@ _RETRY_DELAY_SECONDS = 5
 # ── Public interface ─────────────────────────────────────────────────────────
 
 async def generate_image_hf(prompt: str) -> str:
-    """Generate an image from *prompt* using FLUX.1-schnell on HuggingFace.
+    """Generate an image from *prompt* using FLUX.1-schnell model.
 
     Parameters
     ----------
     prompt : str
-        A descriptive text prompt for the image (e.g. "A cozy Indian café at
-        sunset with warm bokeh lights, photorealistic").
+        A descriptive text prompt for the image.
 
     Returns
     -------
     str
-        A base64-encoded representation of the generated PNG/JPEG image.
-        Suitable for embedding in a JSON response as a data URI:
-        ``data:image/png;base64,<returned_str>``.
-
-    Raises
-    ------
-    Exception
-        If the HuggingFace API returns a non-200 / non-503 status after all
-        retries are exhausted, or if the network request itself fails.
+        A base64-encoded representation of the generated image.
     """
     settings = get_settings()
 
-    # ── Build request artefacts ───────────────────────────────────────────
-    # SECURITY:  .get_secret_value() is the ONE callsite that unwraps the
-    # SecretStr.  It is never stored in a local variable that could be
-    # accidentally logged.
-    headers = {
-        "Authorization": f"Bearer {settings.HF_TOKEN.get_secret_value()}",
-        "Content-Type": "application/json",
-    }
-    payload = {"inputs": prompt}
+    logger.info("Starting image generation | prompt_length=%d", len(prompt))
 
-    logger.info("Starting HuggingFace image generation | prompt_length=%d", len(prompt))
-
-    # ── Retry loop ────────────────────────────────────────────────────────
-    # WHY retry on 503?
-    #   HuggingFace Serverless Inference cold-starts models that haven't
-    #   been called recently.  The first request returns 503 with a JSON
-    #   body {"error": "Model is currently loading"}.  Waiting 5 s and
-    #   retrying is the documented approach.
-    async with httpx.AsyncClient(timeout=60.0) as client:
-        for attempt in range(1, _MAX_RETRIES + 1):
-            logger.debug(
-                "HF image generation attempt %d/%d", attempt, _MAX_RETRIES
-            )
-
-            response = await client.post(_HF_API_URL, headers=headers, json=payload)
-
-            # ── Happy path ────────────────────────────────────────────────
-            if response.status_code == 200:
-                image_bytes: bytes = response.content
-                encoded: str = base64.b64encode(image_bytes).decode("utf-8")
+    # 1. Try Pollinations AI (free, fast FLUX model endpoint)
+    try:
+        encoded_prompt = urllib.parse.quote(prompt)
+        pollinations_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}"
+        
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+            response = await client.get(pollinations_url, headers=headers, follow_redirects=True)
+            if response.status_code == 200 and len(response.content) > 1000:
+                encoded = base64.b64encode(response.content).decode("utf-8")
                 logger.info(
-                    "HF image generation succeeded | attempt=%d bytes=%d",
-                    attempt,
-                    len(image_bytes),
+                    "Image generation succeeded via Pollinations FLUX | bytes=%d",
+                    len(response.content),
                 )
                 return encoded
+    except Exception as exc:
+        logger.warning("Pollinations image generation failed | error=%s", exc)
 
-            # ── Cold-start handling ───────────────────────────────────────
-            if response.status_code == 503:
-                if attempt < _MAX_RETRIES:
-                    logger.warning(
-                        "Model is cold-starting, waiting %ds before retry "
-                        "(attempt %d/%d)...",
-                        _RETRY_DELAY_SECONDS,
-                        attempt,
-                        _MAX_RETRIES,
-                    )
-                    await asyncio.sleep(_RETRY_DELAY_SECONDS)
-                    continue
-                else:
-                    # Final attempt also 503 — give up.
-                    logger.error(
-                        "HF model still loading after %d attempts — giving up.",
-                        _MAX_RETRIES,
-                    )
-                    raise Exception(
-                        f"HuggingFace model did not finish loading after "
-                        f"{_MAX_RETRIES} retries ({_RETRY_DELAY_SECONDS}s each). "
-                        "Please try again in a minute."
-                    )
+    # 2. Fallback to HF Inference API
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        headers = {
+            "Authorization": f"Bearer {settings.HF_TOKEN.get_secret_value()}",
+            "Content-Type": "application/json",
+        }
+        payload = {"inputs": prompt}
 
-            # ── Any other non-200 status ──────────────────────────────────
-            logger.error(
-                "HF image generation failed | status=%d body=%s",
-                response.status_code,
-                response.text[:300],   # truncate to avoid log bloat
-            )
-            raise Exception(
-                f"HuggingFace Inference API returned unexpected status "
-                f"{response.status_code}: {response.text[:200]}"
-            )
+        for attempt in range(1, _MAX_RETRIES + 1):
+            response = await client.post(_HF_API_URL, headers=headers, json=payload)
+            if response.status_code == 200:
+                image_bytes: bytes = response.content
+                return base64.b64encode(image_bytes).decode("utf-8")
+            if response.status_code == 503 and attempt < _MAX_RETRIES:
+                await asyncio.sleep(_RETRY_DELAY_SECONDS)
+                continue
 
-    # Unreachable — the loop above always returns or raises, but satisfies
-    # the type checker.
-    raise Exception("Image generation failed: exhausted all retry attempts.")  # pragma: no cover
+    raise Exception("Image generation failed after all attempts.")  # pragma: no cover

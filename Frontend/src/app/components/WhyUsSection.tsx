@@ -127,7 +127,7 @@ export function WhyUsSection() {
 
               <div className="pt-4 border-t border-[#e6e2de]">
                 <Link
-                  to="/auth"
+                  to="/setup"
                   className="bg-[#b51d0d] hover:bg-[#d83824] text-white px-7 py-3.5 rounded-xl font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all inline-flex items-center gap-3"
                 >
                   <span>Start Free — Build Your Product Not Bills</span>

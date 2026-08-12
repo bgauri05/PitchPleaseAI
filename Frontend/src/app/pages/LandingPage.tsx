@@ -116,7 +116,7 @@ export function LandingPage() {
 
           <div className="flex items-center gap-4">
             <Link 
-              to="/auth" 
+              to="/setup" 
               className="text-sm font-semibold text-[#5b403c] hover:text-[#1d1b19] transition-all"
             >
               Sign In
@@ -127,7 +127,7 @@ export function LandingPage() {
               whileTap={{ scale: 0.95 }}
             >
               <Link 
-                to="/auth"
+                to="/setup"
                 className="px-5 py-2.5 rounded-xl bg-[#b51d0d] hover:bg-[#d83824] text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200 block"
               >
                 Start Free
@@ -180,7 +180,7 @@ export function LandingPage() {
             <div className="flex flex-wrap gap-4 items-center justify-center mb-12">
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                 <Link 
-                  to="/auth"
+                  to="/setup"
                   className="px-8 py-4 rounded-xl bg-[#b51d0d] hover:bg-[#d83824] text-white font-semibold text-base shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-3"
                 >
                   <span>Start Free</span>

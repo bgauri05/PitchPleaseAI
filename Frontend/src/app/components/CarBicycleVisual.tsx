@@ -155,7 +155,7 @@ export function CarBicycleVisual() {
         </p>
 
         <Link
-          to="/auth"
+          to="/setup"
           className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#b51d0d] to-[#dc2626] hover:from-[#d83824] hover:to-[#ef4444] text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all duration-200 group"
         >
           <span>Get AI Agents Now</span>

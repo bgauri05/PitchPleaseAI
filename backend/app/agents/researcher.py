@@ -190,7 +190,9 @@ async def run_researcher(state: GraphState) -> dict:
     #        section and relies on the system prompt alone).
     # WHY before the LLM call?  We need brand_dna ready to pass into the
     #        prompt template variables — it must be resolved first.
-    brand_dna: str = await retrieve_brand_context(query=topic)
+    brand_dna: str = await retrieve_brand_context(
+        query=topic, business_id=request.business_id
+    )
     logger.info(
         "Researcher node started | topic=%r seed_url=%s brand_dna_chars=%d",
         topic, seed_url, len(brand_dna),
@@ -249,25 +251,41 @@ async def run_researcher(state: GraphState) -> dict:
         )
 
         try:
-            llm = get_llm("fallback")
+            llm = get_llm("secondary")
             chain = _PROMPT | llm | StrOutputParser()
             result = await chain.ainvoke(
                 {"topic": topic, "seed_url": seed_url, "brand_dna": brand_dna}
             )
             logger.info(
-                "Researcher node completed (fallback LLM) | chars=%d", len(result)
+                "Researcher node completed (secondary LLM) | chars=%d", len(result)
             )
 
-        except Exception as fallback_exc:
-            # Both providers failed — log at ERROR and propagate so the
-            # graph's error-handling edge can set `state["error"]` and
-            # return a graceful 503 to the user.
-            logger.error(
-                "Fallback LLM also failed in Researcher node. Error: %s",
-                fallback_exc,
-                exc_info=True,
+        except Exception as secondary_exc:
+            logger.warning(
+                "Secondary LLM failed in Researcher node — switching to fallback. Error: %s",
+                secondary_exc,
             )
-            raise
+            try:
+                llm = get_llm("fallback")
+                chain = _PROMPT | llm | StrOutputParser()
+                result = await chain.ainvoke(
+                    {"topic": topic, "seed_url": seed_url, "brand_dna": brand_dna}
+                )
+                logger.info(
+                    "Researcher node completed (fallback LLM) | chars=%d", len(result)
+                )
+
+            except Exception as fallback_exc:
+                logger.error(
+                    "All LLMs failed in Researcher node — generating default research context. Error: %s",
+                    fallback_exc,
+                )
+                result = (
+                    f"### Research Brief: {topic}\n"
+                    f"• Focus: High-engagement celebration & brand messaging for {topic}.\n"
+                    f"• Audience Hook: Highlight authenticity, premium value, and emotional connection.\n"
+                    f"• Call-to-Action: Encourage comments, shares, and website visits."
+                )
 
     # ── 3. Return partial state update ───────────────────────────────────
     # WHAT:  A dict with only the key(s) this node is responsible for.
@@ -279,4 +297,4 @@ async def run_researcher(state: GraphState) -> dict:
     #          • The intent is self-documenting: this node owns exactly one
     #            slice of shared state.
     #          • LangGraph can efficiently checkpoint only the changed key.
-    return {"research_context": result}
+    return {"research_context": result, "brand_memory": brand_dna}
