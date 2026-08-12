@@ -2,6 +2,7 @@ import { motion } from 'motion/react';
 import { User, Bell, Globe, Lock, CreditCard, HelpCircle, LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router';
+import { getInstagramConnectUrl } from '@/lib/scheduling';
 
 export function Settings() {
   const { signOut } = useAuth();
@@ -11,6 +12,22 @@ export function Settings() {
     await signOut();
     navigate('/auth');
   };
+
+  // WHAT: "Connected Accounts" used to be a dead button — this is what
+  // actually kicks off the Instagram OAuth flow (instagram.py's
+  // /connect route), same destination as the dedicated card on the
+  // Scheduled Posts page.
+  const handleItemClick = (label: string) => {
+    if (label === 'Connected Accounts') {
+      const businessId = localStorage.getItem('business_id');
+      if (!businessId) {
+        navigate('/setup');
+        return;
+      }
+      window.location.href = getInstagramConnectUrl(businessId);
+    }
+  };
+
   const settingsSections = [
     {
       title: 'Account',
@@ -101,6 +118,7 @@ export function Settings() {
                   {section.items.map((item, itemIndex) => (
                     <motion.button
                       key={itemIndex}
+                      onClick={() => handleItemClick(item.label)}
                       whileHover={{ backgroundColor: '#F8FAFC' }}
                       className="w-full p-6 text-left transition-colors flex items-center justify-between group"
                     >

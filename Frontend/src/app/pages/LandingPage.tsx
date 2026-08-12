@@ -115,8 +115,13 @@ export function LandingPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <Link 
-              to="/setup" 
+            {/* WHAT: this used to point to /setup — meaning "Sign In" for a
+                returning user actually dropped them into a blank business
+                setup wizard instead of a login form. /auth (AuthPage.tsx)
+                is the real login/signup page; it wasn't reachable from
+                anywhere in the app until now. */}
+            <Link
+              to="/auth"
               className="text-sm font-semibold text-[#5b403c] hover:text-[#1d1b19] transition-all"
             >
               Sign In

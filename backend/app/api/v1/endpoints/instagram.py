@@ -59,7 +59,7 @@ async def instagram_callback(code: str = Query(...), state: str = Query(...)):
     async with httpx.AsyncClient() as client:
         short_lived = await client.get(FACEBOOK_TOKEN_URL, params={
             "client_id": settings.META_APP_ID,
-            "client_secret": settings.META_APP_SECRET,
+            "client_secret": settings.META_APP_SECRET.get_secret_value(),
             "redirect_uri": settings.META_REDIRECT_URI,
             "code": code,
         })
@@ -70,7 +70,7 @@ async def instagram_callback(code: str = Query(...), state: str = Query(...)):
         long_lived = await client.get(FACEBOOK_TOKEN_URL, params={
             "grant_type": "fb_exchange_token",
             "client_id": settings.META_APP_ID,
-            "client_secret": settings.META_APP_SECRET,
+            "client_secret": settings.META_APP_SECRET.get_secret_value(),
             "fb_exchange_token": short_lived_token,
         })
         long_lived_token = long_lived.json()["access_token"]
@@ -95,9 +95,12 @@ async def instagram_callback(code: str = Query(...), state: str = Query(...)):
             )
         ig_user_id = ig_account["id"]
 
+    from datetime import datetime, timezone
+
     get_supabase_client().table("businesses").update({
         "instagram_access_token": long_lived_token,
         "instagram_user_id": ig_user_id,
+        "instagram_token_updated_at": datetime.now(timezone.utc).isoformat(),
     }).eq("id", business_id).execute()
 
     return {"status": "connected", "instagram_user_id": ig_user_id}

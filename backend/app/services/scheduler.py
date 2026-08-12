@@ -8,29 +8,48 @@ HOW:  APScheduler runs check_due_posts() on a fixed interval, inside the
 WHY:  scheduled_posts rows are just data until something actively watches
       the table and acts on due entries — this is that "something."
 
-STATUS: The actual publish step is a stub (publish_stub) until step 5
-        (real Instagram OAuth + publishing) exists. Right now this proves
-        the *detection and firing* mechanism works, using fake near-future
-        timestamps for testing.
+STATUS: The publish step now calls the real Instagram Graph API via
+        app.services.instagram_publish.publish_to_instagram() instead of
+        the old stub. It still can't succeed end to end until a real Meta
+        App ID/Secret exist (see instagram.py) and at least one business
+        has completed the OAuth connect flow — but the detection, firing,
+        error handling, and status-update mechanism here are real, not a
+        simulation. Only 'instagram' is wired up; other platforms fail
+        loudly with a clear "not yet supported" error rather than
+        silently reporting success.
 """
 import logging
 from datetime import datetime, timezone
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from app.services.supabase import get_supabase_client
+from app.services.instagram_publish import publish_to_instagram, InstagramPublishError
 
 logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler()
 
 
-async def publish_stub(post: dict) -> bool:
-    """Placeholder for the real Instagram publish call (step 5).
-    Always 'succeeds' for now so we can test the detection loop end to end."""
-    logger.info(
-        "STUB PUBLISH | business_id=%s platform=%s content=%.50s...",
-        post["business_id"], post["platform"], post["content"],
+async def publish_post(post: dict) -> str:
+    """Publish *post* to whichever platform it's targeted at.
+
+    Returns the platform-assigned post/media id on success. Raises on
+    failure — callers are expected to catch and record the error rather
+    than this function swallowing it, so a failure is never silently
+    reported as a success (the old publish_stub's behavior).
+    """
+    platform = (post.get("platform") or "").lower()
+
+    if platform == "instagram":
+        return await publish_to_instagram(post)
+
+    # WHY raise instead of returning False: other platforms (Facebook,
+    # LinkedIn, Twitter/X) aren't implemented yet. Silently marking these
+    # "posted" would be worse than doing nothing — it would tell the user
+    # something went live when it didn't.
+    raise InstagramPublishError(
+        f"Publishing to platform={platform!r} is not implemented yet — "
+        "only 'instagram' is currently wired to a real API call."
     )
-    return True
 
 
 async def check_due_posts():
@@ -55,12 +74,13 @@ async def check_due_posts():
 
     for post in due_posts:
         try:
-            success = await publish_stub(post)
-            new_status = "posted" if success else "failed"
+            platform_post_id = await publish_post(post)
             client.table("scheduled_posts").update({
-                "status": new_status,
+                "status": "posted",
+                "platform_post_id": platform_post_id,
+                "error_message": None,
             }).eq("id", post["id"]).execute()
-            logger.info("Post %s marked %s", post["id"], new_status)
+            logger.info("Post %s marked posted (platform_post_id=%s)", post["id"], platform_post_id)
         except Exception as exc:
             logger.error("Post %s failed: %s", post["id"], exc, exc_info=True)
             client.table("scheduled_posts").update({

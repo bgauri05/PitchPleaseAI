@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import { supabase } from '@/lib/supabase';
 
 export function BusinessSetup() {
   const navigate = useNavigate();
@@ -298,11 +299,34 @@ export function BusinessSetup() {
         }),
       });
 
+      let finalBusinessId = existingId;
       if (response.ok) {
         const data = await response.json();
         if (data.business_id) {
+          finalBusinessId = data.business_id;
           localStorage.setItem('business_id', data.business_id);
         }
+      }
+
+      // WHAT: mirror the completed setup onto `profiles` for whichever
+      // Supabase account is currently logged in, so AuthPage.tsx's
+      // `profile?.is_setup_complete` redirect (previously always false —
+      // the `profiles` table didn't exist at all until this migration:
+      // backend/migrations/005_profiles.sql) actually reflects reality on
+      // the next login. Safe to skip silently for an anonymous session —
+      // business setup itself still works without an account, same as
+      // before; this only wires up the *account-based* return-user flow.
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('profiles').upsert({
+          id: user.id,
+          business_id: finalBusinessId,
+          business_name: formData.business_name,
+          industry: formData.industry,
+          brand_voice: formData.brand_voice.join(', '),
+          is_setup_complete: true,
+          updated_at: new Date().toISOString(),
+        });
       }
     } catch (error) {
       console.warn('Business setup server sync note:', error);

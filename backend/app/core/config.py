@@ -149,7 +149,16 @@ class Settings(BaseSettings):
 
     # ── Meta / Instagram OAuth ─────────────────────────────
     META_APP_ID: str = ""
-    META_APP_SECRET: str = ""
+    #   Not secret — Meta app IDs are visible in the OAuth redirect URL
+    #   the browser is sent to, so there's nothing to protect here.
+
+    META_APP_SECRET: SecretStr = SecretStr("")
+    #   WHAT:  Used server-side only, to exchange an OAuth code for an
+    #          access token (see instagram.py's /callback route).
+    #   SECURITY (SecretStr):  Same masking guarantees as the other API
+    #          keys above — access the raw value only via
+    #          .get_secret_value() at the exact httpx callsite.
+
     META_REDIRECT_URI: str = ""
 
 

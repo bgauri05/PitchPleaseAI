@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router';
-import { Home, Sparkles, Calendar, PartyPopper, FolderOpen, Settings, LogOut, Menu, X, Bell, ArrowLeft, ChevronRight } from 'lucide-react';
+import { Home, Sparkles, Calendar, PartyPopper, FolderOpen, Send, Settings, LogOut, Menu, X, Bell, ArrowLeft, ChevronRight } from 'lucide-react';
 import { Logo } from './Logo';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -26,6 +26,7 @@ export function DashboardLayout() {
     { path: '/app/planner', label: 'Weekly Planner', icon: Calendar },
     { path: '/app/festivals', label: 'Festival Ideas', icon: PartyPopper },
     { path: '/app/library', label: 'Content Library', icon: FolderOpen },
+    { path: '/app/scheduled', label: 'Scheduled Posts', icon: Send },
   ];
 
   const isActive = (path: string) => {

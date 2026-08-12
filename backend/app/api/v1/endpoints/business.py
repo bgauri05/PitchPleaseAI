@@ -121,9 +121,20 @@ async def update_business(business_id: str, updates: Dict = Body(...)):
 
 @router.get("/{business_id}")
 async def get_business(business_id: str):
-    """Retrieve existing Business Brand Memory profile."""
+    """Retrieve existing Business Brand Memory profile.
+
+    SECURITY: `businesses.instagram_access_token` (added by
+    backend/migrations/004_instagram_connect.sql, written by the OAuth
+    callback in instagram.py) is a long-lived Instagram access token — it
+    must never reach the browser. get_business_profile() does a bare
+    `select("*")`, so we redact it here rather than in every caller.
+    `instagram_user_id` is not a secret (just an account id) and is kept
+    so the frontend can show connection status without needing the token.
+    """
     profile = await get_business_profile(business_id)
     if profile:
+        profile.pop("instagram_access_token", None)
+        profile["instagram_connected"] = bool(profile.get("instagram_user_id"))
         return profile
 
     raise HTTPException(status_code=404, detail="Business not found")
