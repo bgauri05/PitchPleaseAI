@@ -1,4 +1,21 @@
+# PitchPleaseAI
 
+**AI marketing agents that actually know your brand.**
+
+PitchPleaseAI is a marketing co-pilot for small businesses. Three cooperating LLM agents research, draft, and quality-check every social post in your brand voice, a human approves it once, and a background scheduler publishes it to Instagram automatically — no daily content grind required.
+
+![PitchPleaseAI landing page](docs/screenshot-landing.jpg)
+
+**[Live demo →](https://pitchplease-eight.vercel.app)**
+
+Researcher Creator Sentinel
+┌───────────┐ ┌───────────┐ ┌────────────┐
+│ pulls the │ ──▶ │ drafts the│ ──▶ │ checks tone,│ ──▶ human approval ──▶ scheduled
+│ brand's │ │ post in │ │ length, │ (one click) auto-publish
+│ memory │ │ that voice│ │ platform fit│ to Instagram
+└───────────┘ └───────────┘ └────────────┘
+
+## How it works
 Every business gets a persistent **Business Memory** — the Researcher agent grounds each draft in it, so a bakery's captions never sound like a law firm's. Nothing goes out without a human clicking "Approve & Schedule" first; a background poller then handles the actual publish through Instagram's Graph API when the scheduled time comes.
 
 ## Features
