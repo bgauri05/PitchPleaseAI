@@ -89,7 +89,7 @@ class Settings(BaseSettings):
     #   The URL prefix under which all v1 routes are mounted.
 
     # ── CORS ─────────────────────────────────────────────────
-    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:5173"]
+    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"]
     #   WHAT:  Whitelist of frontend origins allowed to call this API.
     #   HOW:   Read by CORSMiddleware in main.py.
     #   SECURITY:  In production, restrict this to your actual frontend
@@ -137,6 +137,18 @@ class Settings(BaseSettings):
     #   SECURITY (SecretStr):  Masked everywhere except the single
     #          comparison callsite in security.py.
 
+    # ── Firebase Admin (auth) ─────────────────────────────────
+    FIREBASE_SERVICE_ACCOUNT_PATH: str = ""
+    FIREBASE_SERVICE_ACCOUNT_JSON: str = ""
+    #   WHAT:  Filesystem path or JSON content string to a Firebase service account
+    #          key file (Firebase Console → Project settings → Service accounts).
+    #          FIREBASE_SERVICE_ACCOUNT_JSON is preferred for serverless deployments (Lambda).
+    #          FIREBASE_SERVICE_ACCOUNT_PATH is used as fallback for local dev.
+    #   SECURITY: this file must be listed in .gitignore (same as .env) —
+    #          it is a real credential, not a public config value like the
+    #          frontend's VITE_FIREBASE_* keys.
+
+
     # ── Hugging Face (free image generation) ─────────────────
     HF_TOKEN: SecretStr = SecretStr("")
     #   WHAT:  Hugging Face User Access Token — used to call the free
@@ -160,6 +172,7 @@ class Settings(BaseSettings):
     #          .get_secret_value() at the exact httpx callsite.
 
     META_REDIRECT_URI: str = ""
+    META_CONFIG_ID: str = ""
 
 
 # ─────────────────────────────────────────────────────────────────────────────

@@ -5,6 +5,11 @@ venv/
 # Environment secrets
 .env
 
+# Firebase Admin SDK service account key (real credential, never commit)
+firebase-service-account*.json
+*firebase-adminsdk*.json
+
+
 # Python
 __pycache__/
 *.py[cod]

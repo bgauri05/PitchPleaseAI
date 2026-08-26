@@ -35,6 +35,31 @@ Parameters:
     Default: "*"
     Description: Allowed CORS origin (e.g. https://d123.cloudfront.net)
 
+  MetaAppId:
+    Type: String
+    Default: ""
+
+  MetaAppSecret:
+    Type: String
+    NoEcho: true
+    Default: ""
+
+  MetaRedirectUri:
+    Type: String
+    Default: ""
+
+  MetaConfigId:
+    Type: String
+    Default: ""
+
+  # Note for sam deploy --guided: paste the entire contents of your local
+  # backend/pitchpleaseai-firebase-adminsdk-fbsvc-fbeae04036.json file
+  # (minified to one line, e.g. via `jq -c . file.json`) as the value for this parameter.
+  FirebaseServiceAccountJson:
+    Type: String
+    NoEcho: true
+    Default: ""
+
 Globals:
   Function:
     Timeout: 120
@@ -59,6 +84,12 @@ Resources:
           SUPABASE_KEY: !Ref SupabaseKey
           HF_TOKEN: !Ref HfToken
           BACKEND_CORS_ORIGINS: !Sub '["${CorsOrigin}"]'
+          META_APP_ID: !Ref MetaAppId
+          META_APP_SECRET: !Ref MetaAppSecret
+          META_REDIRECT_URI: !Ref MetaRedirectUri
+          META_CONFIG_ID: !Ref MetaConfigId
+          FIREBASE_SERVICE_ACCOUNT_JSON: !Ref FirebaseServiceAccountJson
+
           # Defaults that rarely change
           API_V1_STR: /api/v1
           DEFAULT_GROQ_MODEL: llama-3.3-70b-versatile

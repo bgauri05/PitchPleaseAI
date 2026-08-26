@@ -203,15 +203,26 @@ sam deploy --parameter-overrides \
 
 ### Backend (Lambda — set via SAM template parameters)
 
-| Variable                 | Where It Goes     | Example                                |
-|--------------------------|-------------------|----------------------------------------|
-| `ENVIRONMENT`            | Lambda env var    | `production`                           |
-| `API_KEY`                | Lambda env var    | `your-secret-api-key`                  |
-| `GROQ_API_KEY`           | Lambda env var    | `gsk_xxxxxxxx`                         |
-| `SUPABASE_URL`           | Lambda env var    | `https://xyz.supabase.co`              |
-| `SUPABASE_KEY`           | Lambda env var    | `eyJhbGci...`                          |
-| `HF_TOKEN`               | Lambda env var    | `hf_xxxxxxxx`                          |
-| `BACKEND_CORS_ORIGINS`   | Lambda env var    | `["https://d123.cloudfront.net"]`      |
+| Variable                      | Where It Goes     | Example                                |
+|--------------------------------|-------------------|----------------------------------------|
+| `ENVIRONMENT`                  | Lambda env var    | `production`                           |
+| `API_KEY`                      | Lambda env var    | `your-secret-api-key`                  |
+| `GROQ_API_KEY`                 | Lambda env var    | `gsk_xxxxxxxx`                         |
+| `SUPABASE_URL`                 | Lambda env var    | `https://xyz.supabase.co`              |
+| `SUPABASE_KEY`                 | Lambda env var    | `eyJhbGci...`                          |
+| `HF_TOKEN`                     | Lambda env var    | `hf_xxxxxxxx`                          |
+| `BACKEND_CORS_ORIGINS`         | Lambda env var    | `["https://d123.cloudfront.net"]`      |
+| `META_APP_ID`                  | Lambda env var    | your Meta Developer App's App ID (not secret) |
+| `META_APP_SECRET`              | Lambda env var    | your Meta Developer App's App Secret (keep private) |
+| `META_REDIRECT_URI`            | Lambda env var    | `https://<your-api-domain>/api/v1/instagram/callback` — must be a public URL and must exactly match a "Valid OAuth Redirect URI" registered on the Meta app |
+| `META_CONFIG_ID`               | Lambda env var    | your Meta App's Instagram config ID, if using one |
+| `FIREBASE_SERVICE_ACCOUNT_JSON`| Lambda env var    | the full, minified contents of your Firebase service account key file (e.g. `jq -c . backend/*firebase-adminsdk*.json`) — NOT a file path, since Lambda has no persistent local file for it |
+
+> **After deploying:** go to the Meta Developer App dashboard and update its
+> registered "Valid OAuth Redirect URI" from the localhost one to the real
+> `META_REDIRECT_URI` value above — Facebook's OAuth dialog rejects any
+> redirect that isn't an exact match, so the connect flow will fail with
+> `redirect_uri_mismatch` until this is updated.
 
 ### Frontend (Build-time — `Frontend/.env.production`)
 
