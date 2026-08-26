@@ -1,8 +1,10 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
 fastapi>=0.115.0,<1.0.0
 uvicorn>=0.32.0,<1.0.0
 langgraph>=0.2.0,<1.0.0
 langchain>=0.3.0,<1.0.0
 langchain-core>=0.3.0,<1.0.0
+langchain-community>=0.3.0,<1.0.0
 langchain-groq>=0.2.0,<1.0.0
 langchain-aws>=0.2.0,<1.0.0
 supabase>=2.0.0,<3.0.0
@@ -17,3 +19,4 @@ langchain-huggingface>=0.0.3
 sentence-transformers>=3.0.0
 apscheduler>=3.10.0,<4.0.0
 python-multipart>=0.0.9
+firebase-admin>=6.5.0,<7.0.0
