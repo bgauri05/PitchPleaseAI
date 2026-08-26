@@ -9,7 +9,7 @@ export function SolutionsSection() {
         
         {/* Main Red Meme Poster Container (Exact match to reference image with Red Background) */}
         <div 
-          className="relative w-full max-w-2xl mx-auto bg-[#b51d0d] rounded-[2.5rem] p-6 sm:p-12 shadow-[0_24px_64px_rgba(181,29,13,0.25)] overflow-hidden text-center flex flex-col items-center justify-between min-h-[640px] border border-[#d83824]"
+          className="relative w-full max-w-2xl mx-auto bg-[#0A0A0A] rounded-[2.5rem] p-6 sm:p-12 shadow-[0_24px_64px_rgba(181,29,13,0.25)] overflow-hidden text-center flex flex-col items-center justify-between min-h-[640px] border border-[#262626]"
           style={{
             backgroundImage: `
               linear-gradient(to right, rgba(255, 255, 255, 0.12) 1px, transparent 1px),
@@ -23,12 +23,12 @@ export function SolutionsSection() {
           <div className="absolute top-6 right-6 z-20 flex flex-col items-end gap-3">
             {/* Comment & Like Row */}
             <div className="flex items-center gap-2">
-              <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5 text-[10px] font-bold text-[#1d1b19]">
-                <MessageSquare className="w-3.5 h-3.5 fill-[#1d1b19]" />
+              <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5 text-[10px] font-bold text-[#111111]">
+                <MessageSquare className="w-3.5 h-3.5 fill-[#111111]" />
                 <span>Comment</span>
               </div>
-              <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5 text-[10px] font-bold text-[#1d1b19]">
-                <Heart className="w-3.5 h-3.5 fill-[#1d1b19]" />
+              <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5 text-[10px] font-bold text-[#111111]">
+                <Heart className="w-3.5 h-3.5 fill-[#111111]" />
                 <span>Like</span>
               </div>
               {/* Creator Avatar Badge */}
@@ -42,14 +42,14 @@ export function SolutionsSection() {
             </div>
 
             {/* Share Pill */}
-            <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5 text-[10px] font-bold text-[#1d1b19]">
+            <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5 text-[10px] font-bold text-[#111111]">
               <Share2 className="w-3.5 h-3.5" />
               <span>Share</span>
             </div>
 
             {/* Save Pill */}
-            <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5 text-[10px] font-bold text-[#1d1b19]">
-              <Bookmark className="w-3.5 h-3.5 fill-[#1d1b19]" />
+            <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5 text-[10px] font-bold text-[#111111]">
+              <Bookmark className="w-3.5 h-3.5 fill-[#111111]" />
               <span>Save</span>
             </div>
           </div>
@@ -58,7 +58,7 @@ export function SolutionsSection() {
           <div className="relative z-10 w-full pt-4 mb-4 text-center">
             {/* Line 1: Marketing Nahi To... */}
             <div className="inline-flex items-center gap-2 mb-2">
-              <span className="bg-white text-[#1d1b19] font-serif italic text-2xl sm:text-3xl font-extrabold px-4 py-0.5 rounded-md shadow-sm">
+              <span className="bg-white text-[#111111] font-serif italic text-2xl sm:text-3xl font-extrabold px-4 py-0.5 rounded-md shadow-sm">
                 Marketing
               </span>
               <span className="text-white font-serif text-2xl sm:text-3xl font-bold tracking-tight">
@@ -108,7 +108,7 @@ export function SolutionsSection() {
           {/* BOTTOM CONTACT / BRANDSETU AI PILL BAR */}
           <div className="relative z-10 w-full mt-4">
             <div className="bg-white rounded-full py-3 px-6 shadow-lg inline-flex flex-wrap items-center justify-center gap-4 sm:gap-8 border border-white/40 max-w-full">
-              <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-[#1d1b19]">
+              <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-[#111111]">
                 <div className="w-6 h-6 rounded-full bg-[#22c55e] text-white flex items-center justify-center">
                   <Phone className="w-3.5 h-3.5 fill-white" />
                 </div>
@@ -117,7 +117,7 @@ export function SolutionsSection() {
 
               <div className="w-px h-4 bg-slate-200 hidden sm:block" />
 
-              <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-[#1d1b19]">
+              <div className="flex items-center gap-2 text-xs sm:text-sm font-extrabold text-[#111111]">
                 <div className="w-6 h-6 rounded-full bg-[#22c55e] text-white flex items-center justify-center">
                   <Mail className="w-3.5 h-3.5 fill-white" />
                 </div>

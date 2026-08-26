@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import business, content, health, instagram, schedule
+from app.api.v1.endpoints import auth, business, content, health, instagram, schedule
 
 # WHAT:  The single router object imported by main.py.
 # HOW:   main.py calls `app.include_router(api_router, prefix=settings.API_V1_STR)`
@@ -63,4 +63,12 @@ api_router.include_router(
     schedule.router,
     prefix="/schedule",
     tags=["Schedule"],
+)
+
+# ── Firebase auth support endpoints ─────────────────────────────────────
+# Final path: POST /api/v1/auth/set-claims
+api_router.include_router(
+    auth.router,
+    prefix="/auth",
+    tags=["Auth"],
 )

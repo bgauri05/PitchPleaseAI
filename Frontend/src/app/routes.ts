@@ -20,7 +20,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 export const router = createBrowserRouter([
   {
     path: "/",
-    Component: BusinessSetup,
+    Component: LandingPage,
   },
   {
     path: "/landing",

@@ -45,8 +45,11 @@ def connect_instagram(business_id: str = Query(...)):
         "scope": REQUIRED_SCOPES,
         "response_type": "code",
     }
+    if settings.META_CONFIG_ID:
+        params["config_id"] = settings.META_CONFIG_ID
     query = "&".join(f"{k}={v}" for k, v in params.items())
     return RedirectResponse(f"{FACEBOOK_OAUTH_DIALOG}?{query}")
+
 
 
 @router.get("/callback")

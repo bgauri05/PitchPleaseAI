@@ -52,6 +52,36 @@ export function getInstagramConnectUrl(businessId: string): string {
   return `${API_URL}/instagram/connect?business_id=${encodeURIComponent(businessId)}`;
 }
 
+/**
+ * Persists a base64 AI-generated image (apiClient.generateImage's output)
+ * to the backend and returns an absolute URL to it.
+ *
+ * WHAT: Instagram's Content Publishing API needs a public image_url for
+ * every post — a base64 blob shown only in the browser can't be used
+ * directly. This calls the backend's /business/save-generated-image
+ * endpoint (which writes the file and returns a relative "/uploads/..."
+ * path) and resolves that against API_URL's origin so callers get
+ * something fetchable, e.g. "http://localhost:8000/uploads/abc123.png".
+ *
+ * NOTE: that URL is only reachable from *this machine* while running
+ * locally — Meta's servers can't fetch localhost. It becomes genuinely
+ * public once the backend is deployed. See instagram_publish.py.
+ */
+export async function saveGeneratedImage(imageBase64: string): Promise<string> {
+  const response = await fetch(`${API_URL}/business/save-generated-image`, {
+    method: 'POST',
+    headers: defaultHeaders,
+    body: JSON.stringify({ image_base64: imageBase64 }),
+  });
+  if (!response.ok) await handleErrorResponse(response);
+  const data = await response.json();
+  // API_URL is like "http://localhost:8000/api/v1" — strip the "/api/v1"
+  // suffix to get the backend's origin, since /uploads is mounted at the
+  // app root, not under /api/v1 (see backend/app/main.py).
+  const backendOrigin = API_URL.replace(/\/api\/v1\/?$/, '');
+  return `${backendOrigin}${data.url}`;
+}
+
 export async function createScheduledPost(input: {
   business_id: string;
   content: string;

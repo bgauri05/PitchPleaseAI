@@ -8,12 +8,12 @@ import {
   type ScheduledPost,
 } from '@/lib/scheduling';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001/api/v1';
 
 const STATUS_STYLE: Record<ScheduledPost['status'], { label: string; className: string; Icon: typeof Clock }> = {
-  pending: { label: 'Pending', className: 'text-[#b58100] bg-[#f2b705]/15', Icon: Clock },
-  posted: { label: 'Posted', className: 'text-[#136948] bg-[#136948]/10', Icon: CheckCircle2 },
-  failed: { label: 'Failed', className: 'text-[#b51d0d] bg-[#ffdad4]', Icon: XCircle },
+  pending: { label: 'Pending', className: 'text-[#C9E200] bg-[#C9E200]/15', Icon: Clock },
+  posted: { label: 'Posted', className: 'text-[#3AA36B] bg-[#3AA36B]/10', Icon: CheckCircle2 },
+  failed: { label: 'Failed', className: 'text-[#0A0A0A] bg-[#FDEAE5]', Icon: XCircle },
 };
 
 export function ScheduledPosts() {
@@ -82,7 +82,7 @@ export function ScheduledPosts() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-[#b51d0d]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#0A0A0A]" />
       </div>
     );
   }
@@ -90,10 +90,13 @@ export function ScheduledPosts() {
   return (
     <div className="max-w-5xl mx-auto space-y-8 font-body">
       <section>
-        <h1 className="font-headline text-3xl md:text-4xl font-bold text-[#1d1b19] tracking-tight mb-1">
-          Scheduled Posts
+        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#8A8A85] mb-3">
+          <span className="text-[#111111]">06 —</span> Queue
+        </div>
+        <h1 className="font-headline text-3xl md:text-4xl font-extrabold text-[#111111] tracking-tight mb-1">
+          Set it. It <span className="text-[#0A0A0A] bg-[#E4FF3D] px-1">publishes.</span>
         </h1>
-        <p className="text-[#5b403c] text-base">
+        <p className="text-[#4A4A46] text-base mt-2">
           Connect Instagram, then queue posts for the background scheduler to publish automatically.
         </p>
       </section>
@@ -102,15 +105,15 @@ export function ScheduledPosts() {
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl p-6 shadow-[0_8px_24px_rgba(18,17,15,0.08)] border border-[#ece7e3] flex items-center justify-between gap-4"
+        className="bg-white rounded-md p-6 shadow-[0_8px_24px_rgba(18,17,15,0.08)] border border-[#DBDBD8] flex items-center justify-between gap-4"
       >
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-[#b51d0d]/10 flex items-center justify-center text-[#b51d0d] flex-shrink-0">
+          <div className="w-12 h-12 rounded-full bg-[#0A0A0A]/10 flex items-center justify-center text-[#0A0A0A] flex-shrink-0">
             <Instagram className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="font-headline text-lg font-bold text-[#1d1b19]">Instagram</h2>
-            <p className="text-sm text-[#5b403c]">
+            <h2 className="font-headline text-lg font-bold text-[#111111]">Instagram</h2>
+            <p className="text-sm text-[#4A4A46]">
               {connected
                 ? 'Connected — the scheduler can publish to this account.'
                 : 'Not connected yet. Posts will sit as "pending" until this is linked.'}
@@ -118,16 +121,23 @@ export function ScheduledPosts() {
           </div>
         </div>
         {connected ? (
-          <span className="text-xs font-semibold text-[#136948] bg-[#136948]/10 px-3 py-1.5 rounded-md inline-flex items-center gap-1.5 flex-shrink-0">
+          <span className="text-xs font-semibold text-[#3AA36B] bg-[#3AA36B]/10 px-3 py-1.5 rounded-md inline-flex items-center gap-1.5 flex-shrink-0">
             <CheckCircle2 className="w-3.5 h-3.5" /> Connected
           </span>
         ) : (
-          <a
-            href={businessId ? getInstagramConnectUrl(businessId) : '#'}
-            className="inline-flex items-center gap-2 bg-[#b51d0d] text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:bg-[#d83824] transition-colors flex-shrink-0"
+          <button
+            onClick={() => {
+              let targetId = businessId;
+              if (!targetId) {
+                targetId = crypto.randomUUID();
+                localStorage.setItem('business_id', targetId);
+              }
+              window.location.href = getInstagramConnectUrl(targetId);
+            }}
+            className="inline-flex items-center gap-2 bg-[#0A0A0A] text-white px-5 py-2.5 rounded-full font-medium text-sm hover:bg-[#262626] transition-colors flex-shrink-0 cursor-pointer"
           >
             <Link2 className="w-4 h-4" /> Connect Instagram
-          </a>
+          </button>
         )}
       </motion.div>
 
@@ -136,44 +146,44 @@ export function ScheduledPosts() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.05 }}
-        className="bg-white rounded-2xl p-6 shadow-[0_8px_24px_rgba(18,17,15,0.08)] border border-[#ece7e3]"
+        className="bg-white rounded-md p-6 shadow-[0_8px_24px_rgba(18,17,15,0.08)] border border-[#DBDBD8]"
       >
-        <h2 className="font-headline text-lg font-bold text-[#1d1b19] mb-4">Schedule a new post</h2>
+        <h2 className="font-headline text-lg font-bold text-[#111111] mb-4">Schedule a new post</h2>
         <form onSubmit={handleSchedule} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-[#1d1b19]">Caption</label>
+            <label className="text-xs font-semibold text-[#111111]">Caption</label>
             <textarea
               value={content}
               onChange={(e) => setContent(e.target.value)}
               rows={3}
               placeholder="Write the post caption…"
-              className="w-full bg-white border border-[#E5E0D5] rounded-xl px-4 py-3 text-sm text-[#1d1b19] placeholder:text-[#5b403c]/50 focus:border-[#1d1b19] focus:ring-1 focus:ring-[#1d1b19] focus:outline-none transition-colors resize-none"
+              className="w-full bg-white border border-[#DBDBD8] rounded-xl px-4 py-3 text-sm text-[#111111] placeholder:text-[#4A4A46]/50 focus:border-[#111111] focus:ring-1 focus:ring-[#111111] focus:outline-none transition-colors resize-none"
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-[#1d1b19]">
-              Image URL <span className="font-normal text-[#5b403c]">(must be public — a generated/uploaded image link, not a local file)</span>
+            <label className="text-xs font-semibold text-[#111111]">
+              Image URL <span className="font-normal text-[#4A4A46]">(must be public — a generated/uploaded image link, not a local file)</span>
             </label>
             <input
               type="url"
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
               placeholder="https://…"
-              className="w-full bg-white border border-[#E5E0D5] rounded-xl px-4 py-3 text-sm text-[#1d1b19] placeholder:text-[#5b403c]/50 focus:border-[#1d1b19] focus:ring-1 focus:ring-[#1d1b19] focus:outline-none transition-colors"
+              className="w-full bg-white border border-[#DBDBD8] rounded-xl px-4 py-3 text-sm text-[#111111] placeholder:text-[#4A4A46]/50 focus:border-[#111111] focus:ring-1 focus:ring-[#111111] focus:outline-none transition-colors"
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-[#1d1b19]">Publish at</label>
+            <label className="text-xs font-semibold text-[#111111]">Publish at</label>
             <input
               type="datetime-local"
               value={scheduledTime}
               onChange={(e) => setScheduledTime(e.target.value)}
-              className="w-full bg-white border border-[#E5E0D5] rounded-xl px-4 py-3 text-sm text-[#1d1b19] focus:border-[#1d1b19] focus:ring-1 focus:ring-[#1d1b19] focus:outline-none transition-colors"
+              className="w-full bg-white border border-[#DBDBD8] rounded-xl px-4 py-3 text-sm text-[#111111] focus:border-[#111111] focus:ring-1 focus:ring-[#111111] focus:outline-none transition-colors"
             />
           </div>
 
           {formError && (
-            <div className="p-3 bg-[#ffdad6] border border-[#ba1a1a]/30 rounded-xl text-[#93000a] text-sm">
+            <div className="p-3 bg-[#FDEAE5] border border-[#E4573A]/30 rounded-xl text-[#E4573A] text-sm">
               {formError}
             </div>
           )}
@@ -181,7 +191,7 @@ export function ScheduledPosts() {
           <button
             type="submit"
             disabled={submitting}
-            className="self-start inline-flex items-center gap-2 bg-[#b51d0d] hover:bg-[#d83824] text-white font-medium text-sm px-5 py-3 rounded-xl transition-colors disabled:opacity-50"
+            className="self-start inline-flex items-center gap-2 bg-[#0A0A0A] hover:bg-[#262626] text-white font-medium text-sm px-5 py-3 rounded-full transition-colors disabled:opacity-50"
           >
             {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             <span>Schedule Post</span>
@@ -191,32 +201,34 @@ export function ScheduledPosts() {
 
       {/* Queue */}
       <section>
-        <h2 className="font-headline text-2xl font-bold text-[#1d1b19] mb-4">Queue</h2>
+        <h2 className="font-headline text-xl font-extrabold text-[#111111] mb-2">Queue</h2>
         {posts.length === 0 ? (
-          <div className="bg-white rounded-2xl p-8 text-center border border-[#ece7e3]">
-            <p className="text-[#5b403c] text-sm">No posts scheduled yet.</p>
+          <div className="bg-white rounded-md p-8 text-center border border-[#DBDBD8]">
+            <p className="text-[#4A4A46] text-sm">No posts scheduled yet.</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
-            {posts.map((post) => {
+          <div>
+            {posts.map((post, idx) => {
               const status = STATUS_STYLE[post.status];
-              const StatusIcon = status.Icon;
               return (
                 <div
                   key={post.id}
-                  className="bg-white rounded-2xl p-4 shadow-[0_8px_24px_rgba(18,17,15,0.06)] border border-[#ece7e3] flex items-center gap-4"
+                  className="flex items-center gap-6 py-5 border-t border-[#DBDBD8] last:border-b hover:bg-[#F4F4F1]/60 transition-colors"
                 >
+                  <span className="text-xs text-[#8A8A85] w-6 flex-shrink-0">
+                    {String(idx + 1).padStart(2, '0')}
+                  </span>
                   <div className="flex-grow min-w-0">
-                    <p className="text-sm text-[#1d1b19] truncate">{post.content}</p>
-                    <p className="text-xs text-[#5b403c] mt-0.5">
-                      {new Date(post.scheduled_time).toLocaleString()} · {post.platform}
-                    </p>
+                    <p className="font-headline font-bold text-[#111111] truncate">{post.content}</p>
                     {post.status === 'failed' && post.error_message && (
-                      <p className="text-xs text-[#b51d0d] mt-1">{post.error_message}</p>
+                      <p className="text-xs text-[#0A0A0A] mt-1">{post.error_message}</p>
                     )}
                   </div>
-                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-md inline-flex items-center gap-1.5 flex-shrink-0 ${status.className}`}>
-                    <StatusIcon className="w-3.5 h-3.5" /> {status.label}
+                  <span className="text-xs text-[#8A8A85] flex-shrink-0 hidden sm:block">
+                    {new Date(post.scheduled_time).toLocaleString()} · {post.platform}
+                  </span>
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${status.className}`}>
+                    {status.label}
                   </span>
                 </div>
               );

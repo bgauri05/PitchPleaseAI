@@ -23,20 +23,20 @@ export function DemoBannerSection() {
             </div>
 
             <div className="sm:pl-36 relative z-10 max-w-xl">
-              <div className="inline-flex items-center gap-2 bg-[#f8f3ef] border border-[#e4beb7]/50 px-3.5 py-1.5 rounded-full mb-4">
-                <Sparkles className="w-3.5 h-3.5 text-[#b51d0d]" />
-                <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#b51d0d]">
+              <div className="inline-flex items-center gap-2 bg-[#F4F4F1] border border-[#DBDBD8]/50 px-3.5 py-1.5 rounded-full mb-4">
+                <Sparkles className="w-3.5 h-3.5 text-[#0A0A0A]" />
+                <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#0A0A0A]">
                   Autonomous Agent Workflow
                 </span>
               </div>
 
               {/* Headline */}
-              <h2 className="font-headline text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#1d1b19] tracking-tight leading-[1.1] mb-6">
-                Put AI agents to work, <span className="text-[#b51d0d]">on your terms</span>
+              <h2 className="font-headline text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#111111] tracking-tight leading-[1.1] mb-6">
+                Put AI agents to work, <span className="text-[#0A0A0A]">on your terms</span>
               </h2>
 
               {/* Subhead */}
-              <p className="font-body text-base sm:text-lg text-[#5b403c] mb-8 leading-relaxed">
+              <p className="font-body text-base sm:text-lg text-[#4A4A46] mb-8 leading-relaxed">
                 Explore how BrandSetu agents help teams turn strategy into execution across every channel, market, and audience.
               </p>
 
@@ -45,7 +45,7 @@ export function DemoBannerSection() {
                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="inline-block">
                   <Link
                     to="/setup"
-                    className="bg-[#b51d0d] hover:bg-[#d83824] text-white px-8 py-4 rounded-xl font-bold text-base shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center gap-3"
+                    className="bg-[#0A0A0A] hover:bg-[#262626] text-white px-8 py-4 rounded-xl font-bold text-base shadow-md hover:shadow-lg transition-all duration-200 inline-flex items-center gap-3"
                   >
                     <span>Start Free Today</span>
                     <ArrowRight className="w-5 h-5" />

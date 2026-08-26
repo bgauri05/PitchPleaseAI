@@ -12,10 +12,10 @@ export function FeedbackBentoSection() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 bg-[#f8f3ef] border border-[#e4beb7]/50 px-4 py-1.5 rounded-full mb-4"
+            className="inline-flex items-center gap-2 bg-[#F4F4F1] border border-[#DBDBD8]/50 px-4 py-1.5 rounded-full mb-4"
           >
-            <Star className="w-4 h-4 text-[#b51d0d] fill-[#b51d0d]" />
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#b51d0d]">
+            <Star className="w-4 h-4 text-[#0A0A0A] fill-[#0A0A0A]" />
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#0A0A0A]">
               Proven Impact & Reviews
             </span>
           </motion.div>
@@ -25,7 +25,7 @@ export function FeedbackBentoSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1d1b19] tracking-tight leading-tight mb-4"
+            className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#111111] tracking-tight leading-tight mb-4"
           >
             Trusted by founders & marketing leads across Bharat
           </motion.h2>
@@ -35,7 +35,7 @@ export function FeedbackBentoSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="font-body text-base sm:text-lg text-[#5b403c] leading-relaxed"
+            className="font-body text-base sm:text-lg text-[#4A4A46] leading-relaxed"
           >
             Real results, massive time savings, and authentic brand voice fidelity at scale.
           </motion.p>
@@ -115,7 +115,7 @@ export function FeedbackBentoSection() {
 
             {/* Quote content */}
             <div className="sm:col-span-7 flex flex-col justify-between h-full py-1">
-              <p className="font-body text-xs sm:text-sm text-[#1d1b19] font-medium leading-relaxed italic mb-4">
+              <p className="font-body text-xs sm:text-sm text-[#111111] font-medium leading-relaxed italic mb-4">
                 "Thrilled to have PitchPleaseAI as our agentic partner. It’s not just about efficiency gains, it’s about augmenting human creativity, scaling expertise, and unlocking new ways to engage customers."
               </p>
               <div className="flex items-center gap-2 pt-3 border-t border-slate-100">
@@ -148,7 +148,7 @@ export function FeedbackBentoSection() {
 
             {/* Quote content */}
             <div className="sm:col-span-7 flex flex-col justify-between h-full py-1">
-              <p className="font-body text-xs sm:text-sm text-[#1d1b19] font-medium leading-relaxed italic mb-4">
+              <p className="font-body text-xs sm:text-sm text-[#111111] font-medium leading-relaxed italic mb-4">
                 "Our marketing teams have cracked the code of using PitchPleaseAI as an agentic partner in our day-to-day lives, transforming how we work, collaborate, and evolve as an organization."
               </p>
               <div className="flex items-center gap-2 pt-3 border-t border-slate-100">
@@ -266,7 +266,7 @@ export function FeedbackBentoSection() {
 
             {/* Quote content */}
             <div className="sm:col-span-7 flex flex-col justify-between h-full py-1">
-              <p className="font-body text-[#1d1b19] font-medium italic leading-relaxed text-sm sm:text-base mb-6">
+              <p className="font-body text-[#111111] font-medium italic leading-relaxed text-sm sm:text-base mb-6">
                 "PitchPleaseAI has the potential to fundamentally transform the way marketing teams operate by boosting efficiency, accelerating execution, and delivering high-quality campaigns faster."
               </p>
               <div className="flex items-center gap-2 pt-3 border-t border-slate-100">

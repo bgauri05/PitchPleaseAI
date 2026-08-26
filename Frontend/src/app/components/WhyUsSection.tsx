@@ -13,10 +13,10 @@ export function WhyUsSection() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 bg-[#f8f3ef] border border-[#e4beb7]/50 px-4 py-1.5 rounded-full mb-4"
+            className="inline-flex items-center gap-2 bg-[#F4F4F1] border border-[#DBDBD8]/50 px-4 py-1.5 rounded-full mb-4"
           >
-            <Sparkles className="w-4 h-4 text-[#b51d0d]" />
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#b51d0d]">
+            <Sparkles className="w-4 h-4 text-[#0A0A0A]" />
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#0A0A0A]">
               Why BrandSetu?
             </span>
           </motion.div>
@@ -26,10 +26,10 @@ export function WhyUsSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1d1b19] tracking-tight leading-tight mb-4"
+            className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#111111] tracking-tight leading-tight mb-4"
           >
             Build your startup.{' '}
-            <span className="text-[#b51d0d]">
+            <span className="text-[#0A0A0A]">
               Let AI handle marketing.
             </span>
           </motion.h2>
@@ -39,7 +39,7 @@ export function WhyUsSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="font-body text-base sm:text-lg text-[#5b403c] leading-relaxed"
+            className="font-body text-base sm:text-lg text-[#4A4A46] leading-relaxed"
           >
             Because burning precious runway before finding product-market fit makes no sense. BrandSetu gives you an autonomous 3-agent marketing team at a fraction of the cost.
           </motion.p>
@@ -58,7 +58,7 @@ export function WhyUsSection() {
           >
             <div className="bg-white p-4 sm:p-5 rounded-3xl border border-[#e6e2de] shadow-[0_16px_40px_rgba(18,17,15,0.06)] relative overflow-hidden group">
               {/* Highlight Tag */}
-              <div className="absolute top-6 left-6 z-10 bg-[#facc15] text-[#1d1b19] font-mono text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md shadow-xs">
+              <div className="absolute top-6 left-6 z-10 bg-[#facc15] text-[#111111] font-mono text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-md shadow-xs">
                 Founder Dilemma #1
               </div>
 
@@ -72,7 +72,7 @@ export function WhyUsSection() {
               </div>
 
               <div className="mt-4 text-center">
-                <p className="font-headline text-xs sm:text-sm font-semibold text-[#5b403c] italic">
+                <p className="font-headline text-xs sm:text-sm font-semibold text-[#4A4A46] italic">
                   "Stop blowing your runway on bloated agency retainers."
                 </p>
               </div>
@@ -90,12 +90,12 @@ export function WhyUsSection() {
             <div className="bg-white border border-[#e6e2de] rounded-3xl p-6 sm:p-8 shadow-[0_12px_36px_rgba(18,17,15,0.04)] space-y-6">
               
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-[#fee2e2] text-[#b51d0d] flex items-center justify-center font-bold text-lg shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-[#fee2e2] text-[#0A0A0A] flex items-center justify-center font-bold text-lg shrink-0">
                   💰
                 </div>
                 <div>
-                  <h3 className="font-headline text-lg font-bold text-[#1d1b19]">Save Your Startup Runway</h3>
-                  <p className="text-xs sm:text-sm text-[#5b403c] mt-1 leading-relaxed">
+                  <h3 className="font-headline text-lg font-bold text-[#111111]">Save Your Startup Runway</h3>
+                  <p className="text-xs sm:text-sm text-[#4A4A46] mt-1 leading-relaxed">
                     Keep 100% of your funds focused on product development, engineering, and customer support instead of burning cash early on.
                   </p>
                 </div>
@@ -106,8 +106,8 @@ export function WhyUsSection() {
                   🤖
                 </div>
                 <div>
-                  <h3 className="font-headline text-lg font-bold text-[#1d1b19]">3 Autonomous AI Agents Working 24/7</h3>
-                  <p className="text-xs sm:text-sm text-[#5b403c] mt-1 leading-relaxed">
+                  <h3 className="font-headline text-lg font-bold text-[#111111]">3 Autonomous AI Agents Working 24/7</h3>
+                  <p className="text-xs sm:text-sm text-[#4A4A46] mt-1 leading-relaxed">
                     Researcher, Creator, and Sentinel agents continuously analyze trends, write multi-channel posts, and audit every draft in your brand voice.
                   </p>
                 </div>
@@ -118,8 +118,8 @@ export function WhyUsSection() {
                   🪔
                 </div>
                 <div>
-                  <h3 className="font-headline text-lg font-bold text-[#1d1b19]">Festivals & Multi-Language Support Included</h3>
-                  <p className="text-xs sm:text-sm text-[#5b403c] mt-1 leading-relaxed">
+                  <h3 className="font-headline text-lg font-bold text-[#111111]">Festivals & Multi-Language Support Included</h3>
+                  <p className="text-xs sm:text-sm text-[#4A4A46] mt-1 leading-relaxed">
                     Pre-loaded with Indian festival calendars and bilingual English & Hindi campaign copy tailored for LinkedIn, Twitter, and Instagram.
                   </p>
                 </div>
@@ -128,7 +128,7 @@ export function WhyUsSection() {
               <div className="pt-4 border-t border-[#e6e2de]">
                 <Link
                   to="/setup"
-                  className="bg-[#b51d0d] hover:bg-[#d83824] text-white px-7 py-3.5 rounded-xl font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all inline-flex items-center gap-3"
+                  className="bg-[#0A0A0A] hover:bg-[#262626] text-white px-7 py-3.5 rounded-xl font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all inline-flex items-center gap-3"
                 >
                   <span>Start Free — Build Your Product Not Bills</span>
                   <ArrowRight className="w-4 h-4" />

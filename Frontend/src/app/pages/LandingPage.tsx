@@ -1,444 +1,401 @@
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'motion/react';
-import { 
-  ArrowRight, Sparkles, CheckCircle2, XCircle, RefreshCw, 
-  Linkedin, Twitter, Instagram, Play, Bot, Database, CalendarDays,
-  ShieldCheck, HelpCircle
-} from 'lucide-react';
-import { Link } from 'react-router';
+import { motion } from 'motion/react';
+import { ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router';
 import { Logo } from '../components/Logo';
-import { CapabilityBar } from '../components/CapabilityBar';
-import { FeatureSliderSection } from '../components/FeatureSliderSection';
-import { FeedbackBentoSection } from '../components/FeedbackBentoSection';
-import { CarBicycleVisual } from '../components/CarBicycleVisual';
-import { BrandJourneyMap } from '../components/BrandJourneyMap';
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '../components/ui/accordion';
-import { useRef, useState, useEffect } from 'react';
+
+const PLATFORM_TICKER: { name: string; hot?: boolean }[] = [
+  { name: 'INSTAGRAM' },
+  { name: 'LINKEDIN' },
+  { name: 'WHATSAPP', hot: true },
+  { name: 'TWITTER / X' },
+  { name: 'EMAIL' },
+  { name: 'FACEBOOK', hot: true },
+];
 
 export function LandingPage() {
-  const { scrollY } = useScroll();
-  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
-  const heroScale = useTransform(scrollY, [0, 300], [1, 0.95]);
+  const navigate = useNavigate();
 
-  // Festivals dataset preserved
-  const festivals = [
-    { name: 'Diwali', emoji: '🪔', color: 'from-[#FF9F1C] to-[#FFB088]', glow: 'rgba(255, 159, 28, 0.4)', sample: 'Brighten up your sales this festive season!' },
-    { name: 'Eid', emoji: '🌙', color: 'from-[#22C55E] to-[#16A34A]', glow: 'rgba(34, 197, 94, 0.4)', sample: 'Warm wishes & exclusive holiday discounts.' },
-    { name: 'Holi', emoji: '🎨', color: 'from-[#FF6B9D] to-[#FF9F1C]', glow: 'rgba(255, 107, 157, 0.4)', sample: 'Add vibrant colors to your marketing campaign!' },
-    { name: 'Navratri', emoji: '💃', color: 'from-[#6366F1] to-[#8B5CF6]', glow: 'rgba(99, 102, 241, 0.4)', sample: '9 days of festivity & special customer offers.' },
-    { name: 'Independence Day', emoji: '🇮🇳', color: 'from-[#FF9F1C] to-[#22C55E]', glow: 'rgba(255, 159, 28, 0.4)', sample: 'Celebrate freedom with our special package.' },
+  // The three-agent pipeline, shown in the "Meet the Pipeline" section below
+  const agents = [
+    {
+      letter: 'R',
+      tag: 'Agent 01',
+      title: 'Researcher',
+      desc: 'Scans trends, competitors, and upcoming festivals in your industry to find what\'s actually worth posting about this week.',
+      theme: 'bg-[#0A0A0A] text-white',
+      letterColor: 'text-white/90',
+    },
+    {
+      letter: 'C',
+      tag: 'Agent 02',
+      title: 'Creator',
+      desc: 'Drafts captions, hooks, and visuals in your brand voice — Friendly, Bold, Luxury, Educational, whatever you picked at setup.',
+      theme: 'bg-[#E4FF3D] text-[#0A0A0A]',
+      letterColor: 'text-[#0A0A0A]/80',
+    },
+    {
+      letter: 'S',
+      tag: 'Agent 03',
+      title: 'Sentinel',
+      desc: 'Reviews every draft against your brand guardrails before it\'s ever allowed to reach your queue.',
+      theme: 'bg-white text-[#0A0A0A] border border-[#DBDBD8]',
+      letterColor: 'text-[#0A0A0A]/[0.06]',
+    },
+  ];
+
+  // The step-by-step flow, shown in "How It Works"
+  const howItWorks = [
+    { idx: '01', title: 'Tell us who you are', desc: 'Ten-minute setup: brand voice, values, audience, and products.' },
+    { idx: '02', title: 'Generate or plan a week', desc: 'Ask for one post, or let agents fill your whole 7-day calendar.' },
+    { idx: '03', title: 'Sentinel reviews, you approve', desc: 'Every draft is pre-screened — you get final say before it\'s scheduled.' },
+    { idx: '04', title: 'Auto-publish, 24/7', desc: 'Approved posts go out on schedule across Instagram, LinkedIn, WhatsApp, and more.' },
   ];
 
   // Testimonials dataset preserved
   const testimonials = [
-    { 
-      name: 'Priya Sharma', 
+    {
+      name: 'Priya Sharma',
       business: 'Boutique Owner, Mumbai',
       avatar: 'PS',
       text: 'PitchPleaseAI transformed how I market my boutique. Festival posts that used to take hours now take minutes!',
-      gradient: 'from-pink-500 to-purple-500'
     },
-    { 
-      name: 'Rajesh Kumar', 
+    {
+      name: 'Rajesh Kumar',
       business: 'Tech Startup, Bangalore',
       avatar: 'RK',
       text: 'Finally, marketing content in both English and Hindi. Perfect for reaching all my customers across India.',
-      gradient: 'from-blue-500 to-cyan-500'
     },
-    { 
-      name: 'Meera Patel', 
+    {
+      name: 'Meera Patel',
       business: 'Cafe Owner, Delhi',
       avatar: 'MP',
       text: 'The AI understands my brand voice perfectly. It\'s like having a dedicated marketing team in my pocket!',
-      gradient: 'from-orange-500 to-rose-500'
     },
   ];
-
-  // Real backend platforms
-  const supportedPlatforms = [
-    {
-      id: 'linkedin',
-      name: 'LinkedIn',
-      icon: Linkedin,
-      color: 'from-blue-600 to-blue-400',
-      description: 'Professional thought leadership, industry insights, and b2b campaign copy tailored for corporate networks.',
-      previewText: '🚀 Exciting milestone! We just published our Q3 guide on scaling local retail brand voices using AI context...'
-    },
-    {
-      id: 'twitter',
-      name: 'Twitter / X',
-      icon: Twitter,
-      color: 'from-sky-500 to-cyan-400',
-      description: 'Punchy threads, trending hashtag hooks, and concise announcements engineered for viral engagement.',
-      previewText: 'Thread: 5 ways Indian D2C brands are automating festival marketing without losing authenticity 🧵👇'
-    },
-    {
-      id: 'instagram',
-      name: 'Instagram',
-      icon: Instagram,
-      color: 'from-pink-500 via-rose-500 to-yellow-500',
-      description: 'Engaging captions, carousel scripts, and hashtag strategies paired with festive story templates.',
-      previewText: '✨ Diwali Special! 🪔 Bring festive warmth to your customer base. Swipe left for exclusive festival packages 🛍️'
-    }
-  ];
-
-  const scrollToHowItWorks = () => {
-    const element = document.getElementById('how-it-works');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
-    <div className="min-h-screen bg-white text-[#1d1b19] font-body relative overflow-x-hidden antialiased">
+    <div className="min-h-screen bg-white text-[#111111] font-body relative overflow-x-hidden antialiased">
       {/* Sticky Navigation */}
-      <motion.header 
-        className="sticky top-0 bg-white/95 backdrop-blur-md z-50 border-b border-slate-100 shadow-xs"
+      <motion.header
+        className="sticky top-0 bg-white/95 backdrop-blur-md z-50 border-b border-[#DBDBD8]"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100 }}
       >
-        <nav className="container mx-auto px-6 py-4 flex items-center justify-between max-w-7xl">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Logo size="md" />
-          </motion.div>
-          
-          <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-[#5b403c]">
-            <a href="#campaign-slider" className="hover:text-[#b51d0d] transition-colors">Platform Engine</a>
-            <a href="#feedbacks" className="hover:text-[#b51d0d] transition-colors">Reviews & Stats</a>
-            <a href="#features" className="hover:text-[#b51d0d] transition-colors">Features</a>
-            <a href="#how-it-works" className="hover:text-[#b51d0d] transition-colors">How It Works</a>
-            <a href="#faq" className="hover:text-[#b51d0d] transition-colors">FAQ</a>
+        <nav className="container mx-auto px-6 py-4 flex items-center justify-between max-w-6xl">
+          <Logo size="md" />
+
+          <div className="hidden md:flex items-center gap-6 text-xs font-semibold text-[#555]">
+            <a href="#top" className="bg-white px-4 py-2 rounded-full border border-[#DBDBD8] hover:border-[#111111] transition-colors">Product</a>
+            <a href="#pipeline" className="hover:text-[#0A0A0A] transition-colors">Pipeline</a>
+            <a href="#contact" className="hover:text-[#0A0A0A] transition-colors">Pricing</a>
+            <Link to="/auth?mode=login" className="hover:text-[#0A0A0A] transition-colors">Sign In</Link>
           </div>
 
-          <div className="flex items-center gap-4">
-            {/* WHAT: this used to point to /setup — meaning "Sign In" for a
-                returning user actually dropped them into a blank business
-                setup wizard instead of a login form. /auth (AuthPage.tsx)
-                is the real login/signup page; it wasn't reachable from
-                anywhere in the app until now. */}
-            <Link
-              to="/auth"
-              className="text-sm font-semibold text-[#5b403c] hover:text-[#1d1b19] transition-all"
-            >
-              Sign In
-            </Link>
-            
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link 
-                to="/setup"
-                className="px-5 py-2.5 rounded-xl bg-[#b51d0d] hover:bg-[#d83824] text-white text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200 block"
-              >
-                Start Free
-              </Link>
-            </motion.div>
-          </div>
+          <Link
+            to="/auth?mode=signup"
+            className="px-5 py-2.5 rounded-full bg-[#0A0A0A] hover:bg-[#262626] text-white text-sm font-semibold transition-colors inline-flex items-center gap-1.5"
+          >
+            Start Free <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </nav>
       </motion.header>
 
-      {/* SECTION 1: HERO HEADER & SLIDER SHOWCASE */}
-      <section className="relative overflow-hidden pt-12 lg:pt-16 pb-0 bg-white">
-        <motion.div 
-          className="container mx-auto px-6 max-w-7xl relative z-10 text-center"
-          style={{ opacity: heroOpacity, scale: heroScale }}
+      {/* SECTION 1: HERO */}
+      <section id="top" className="relative overflow-hidden pt-16 md:pt-20">
+        <div
+          className="absolute font-headline font-black text-[#0A0A0A]/5 pointer-events-none select-none hidden md:block"
+          style={{ fontSize: 260, lineHeight: 1, top: 100, left: -20 }}
         >
-          {/* Centered Hero Header */}
+          pitch
+        </div>
+
+        <div className="container mx-auto px-6 max-w-6xl relative z-10">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="max-w-4xl mx-auto mb-10"
+            transition={{ duration: 0.7 }}
+            className="max-w-3xl"
           >
-            {/* Badge */}
-            <motion.div 
-              className="inline-flex items-center gap-2 bg-[#f8f3ef] border border-[#e4beb7]/60 px-4 py-1.5 rounded-full mb-6"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <Sparkles className="w-4 h-4 text-[#5647c8]" />
-              <span className="text-xs font-semibold uppercase tracking-wider text-[#5647c8]">
-                Put AI agents to work for marketing
-              </span>
-            </motion.div>
-            
-            {/* Main Headline */}
-            <h1 className="font-headline text-4xl sm:text-5xl lg:text-6xl font-bold text-[#1d1b19] mb-6 leading-[1.12] tracking-tight">
-              AI marketing agents that{' '}
-              <span className="text-[#b51d0d]">
-                actually know your brand
+            <div className="text-xs font-bold uppercase tracking-widest text-[#8A8A85] mb-4">
+              Put AI Agents To Work
+            </div>
+
+            <h1 className="font-headline text-5xl sm:text-6xl lg:text-[76px] font-black leading-[0.98] tracking-tight mb-5">
+              AI marketing<br />
+              agents that{' '}
+              <span className="text-[#C9E200]">
+                actually<br />know your brand
               </span>
             </h1>
-            
-            {/* Subhead */}
-            <p className="font-body text-lg sm:text-xl text-[#5b403c] mb-8 leading-relaxed max-w-2xl mx-auto">
-              <strong className="text-[#1d1b19] font-semibold">Researcher, Creator, and Sentinel</strong> agents draft, refine, and approve social content in your brand voice — festival calendar included.
+
+            <p className="text-base text-[#4A4A46] leading-relaxed max-w-lg mt-5">
+              Researcher, Creator, and Sentinel agents draft, refine, and approve social content in your brand voice — powered by a persistent Business Memory Module.
             </p>
 
-            {/* CTAs */}
-            <div className="flex flex-wrap gap-4 items-center justify-center mb-12">
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-                <Link 
-                  to="/setup"
-                  className="px-8 py-4 rounded-xl bg-[#b51d0d] hover:bg-[#d83824] text-white font-semibold text-base shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-3"
-                >
-                  <span>Start Free</span>
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </motion.div>
-              
-              <motion.button 
-                onClick={scrollToHowItWorks}
-                className="bg-white border-[1.5px] border-[#1d1b19] px-7 py-4 rounded-xl hover:bg-[#f8f3ef] transition-all font-semibold text-[#1d1b19] flex items-center gap-2"
-                whileHover={{ scale: 1.03, y: -2 }}
-                whileTap={{ scale: 0.97 }}
+            <div className="mt-8 flex max-w-[520px] border-2 border-[#111111] rounded-full overflow-hidden">
+              <input
+                type="text"
+                placeholder="Enter your business name…"
+                id="hero-brand-input"
+                className="flex-1 min-w-0 px-5 py-4 text-sm text-[#111111] placeholder:text-[#4A4A46]/60 focus:outline-none bg-white"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const input = document.getElementById('hero-brand-input') as HTMLInputElement;
+                  const val = input?.value?.trim() || '';
+                  navigate(
+                    val
+                      ? `/auth?mode=signup&brand_name=${encodeURIComponent(val)}`
+                      : '/auth?mode=signup'
+                  );
+                }}
+                className="px-6 bg-[#E4FF3D] hover:bg-[#C9E200] text-[#0A0A0A] font-semibold text-sm transition-colors whitespace-nowrap cursor-pointer"
               >
-                <Play className="w-4 h-4 text-[#1d1b19] fill-[#1d1b19]" />
-                See it in action
-              </motion.button>
+                Build Brand Memory
+              </button>
             </div>
           </motion.div>
-        </motion.div>
 
-        {/* Feature Slider Showcase Right at the Start of Website */}
-        <div id="campaign-slider">
-          <FeatureSliderSection />
-        </div>
-      </section>
-
-      {/* SECTION 2: SOCIAL PROOF BAR */}
-      <CapabilityBar />
-
-      {/* SECTION 5: HOW IT WORKS (Interactive Car Journey Roadmap) */}
-      <BrandJourneyMap />
-
-
-
-      {/* SECTION 6: FESTIVAL-AWARE CONTENT (FEATURE DEEP-DIVE) */}
-      <section className="py-24 relative z-10 bg-white">
-        <div className="container mx-auto px-6 max-w-7xl">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left: Visual Cards */}
+          {/* Platform ticker */}
+          <div className="overflow-hidden whitespace-nowrap border-y border-[#DBDBD8] py-3 mt-14">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
-              transition={{ duration: 0.8 }}
-              className="grid grid-cols-2 sm:grid-cols-3 gap-4"
+              className="inline-flex font-headline font-extrabold text-sm tracking-wide"
+              animate={{ x: ['0%', '-50%'] }}
+              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
             >
-              {festivals.map((fest, idx) => (
-                <motion.div
-                  key={fest.name}
-                  whileHover={{ scale: 1.05, y: -4 }}
-                  className="glass-card-strong rounded-2xl p-4 text-center border border-white/40 shadow-sm cursor-pointer"
-                >
-                  <div className="text-4xl mb-2">{fest.emoji}</div>
-                  <div className="text-sm font-bold text-[#0F172A] mb-1">{fest.name}</div>
-                  <div className="text-[11px] text-[#64748B] line-clamp-2">{fest.sample}</div>
-                </motion.div>
+              {[0, 1].map((rep) => (
+                <span key={rep} className="inline-flex items-center">
+                  {PLATFORM_TICKER.map((p) => (
+                    <span key={`${rep}-${p.name}`} className="inline-flex items-center">
+                      <span className={`mx-6 ${p.hot ? 'text-[#C9E200]' : 'text-[#8A8A85]'}`}>{p.name}</span>
+                      <span className="text-[#DBDBD8]">—</span>
+                    </span>
+                  ))}
+                </span>
               ))}
             </motion.div>
+          </div>
 
-            {/* Right: Copy */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, amount: 0.1 }}
-              transition={{ duration: 0.8 }}
-            >
-              <div className="inline-flex items-center gap-2 bg-[#f8f3ef] border border-[#e4beb7]/50 px-3.5 py-1.5 rounded-full mb-4">
-                <span className="text-sm">🪔</span>
-                <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#b51d0d]">
-                  Cultural Intelligence
-                </span>
+          {/* Stat row */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-10">
+            {[
+              { n: '6', l: 'Platforms', d: 'supported at launch' },
+              { n: '6', l: 'Languages', d: 'including regional Indian' },
+              { n: '3', l: 'AI Agents', d: 'researcher, creator, sentinel' },
+              { n: '24/7', l: 'Auto-publish', d: 'background scheduler' },
+            ].map((s) => (
+              <div key={s.l} className="border-t-2 border-[#111111] pt-5">
+                <span className="font-headline text-4xl md:text-5xl font-black text-[#111111] block">{s.n}</span>
+                <span className="text-xs font-semibold text-[#111111] mt-1 block">{s.l}</span>
+                <span className="text-[11px] text-[#8A8A85] mt-1 block">{s.d}</span>
               </div>
-              <h2 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1d1b19] mb-6 leading-tight">
-                Diwali, Eid, Holi, Independence Day —{' '}
-                <span className="text-[#b51d0d]">
-                  PitchPleaseAI drafts for it automatically
-                </span>
-              </h2>
-              <p className="text-lg text-[#64748B] mb-6 leading-relaxed">
-                Unlike generic Western marketing AI tools, PitchPleaseAI comes pre-loaded with an Indian festival calendar. It anticipates holiday rushes and generates culturally authentic campaigns ahead of time.
-              </p>
-              <div className="glass-card rounded-2xl p-4 border border-white/30 flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#FF9F1C] to-[#FF6B9D] text-white flex items-center justify-center font-bold text-lg">
-                  🇮🇳
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-[#0F172A]">Automated Calendar Reminders</h4>
-                  <p className="text-xs text-[#64748B]">Get campaign drafts 7 days before major regional and national festivals.</p>
-                </div>
-              </div>
-            </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-
-
-      {/* SECTION 8: PROVEN IMPACT, BENTO REVIEWS & STATISTICS */}
-      <FeedbackBentoSection />
-
-      {/* SECTION 10: FAQ */}
-      <section id="faq" className="py-24 relative z-10">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="inline-flex items-center gap-2 bg-[#f8f3ef] border border-[#e4beb7]/50 px-3.5 py-1.5 rounded-full mb-4">
-              <HelpCircle className="w-3.5 h-3.5 text-[#b51d0d]" />
-              <span className="text-xs font-mono font-semibold uppercase tracking-wider text-[#b51d0d]">
-                Frequently Asked Questions
-              </span>
-            </div>
-            <h2 className="font-headline text-4xl lg:text-5xl font-extrabold text-[#1d1b19] mb-4">
-              Everything You <span className="text-[#b51d0d]">Need to Know</span>
-            </h2>
-            <p className="text-lg text-[#64748B]">
-              Clear answers to how PitchPleaseAI powers your marketing pipeline.
-            </p>
-          </motion.div>
-
+      {/* SECTION 2: MEET THE PIPELINE (3 agent cards) */}
+      <section id="pipeline" className="py-20 md:py-24 relative z-10 bg-white border-t border-[#DBDBD8]">
+        <div className="container mx-auto px-6 max-w-7xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.1 }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6 }}
-            className="glass-card-strong rounded-3xl p-6 sm:p-8 border border-white/40 shadow-[0_16px_48px_rgba(0,0,0,0.06)]"
+            className="mb-10 max-w-2xl"
           >
-            <Accordion type="single" collapsible className="w-full divide-y divide-slate-200/60">
-              <AccordionItem value="item-1">
-                <AccordionTrigger className="text-base font-bold text-[#0F172A] hover:no-underline hover:text-[#2EC4B6]">
-                  Is this just ChatGPT with a UI wrapper?
-                </AccordionTrigger>
-                <AccordionContent className="text-slate-600 leading-relaxed text-sm">
-                  No. PitchPleaseAI runs an autonomous multi-agent pipeline (Researcher, Creator, and Sentinel). Instead of generating raw unedited text from a single prompt, Sentinel continuously inspects, critiques, and refines every draft against your stored brand guidelines until it clears strict quality standards.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="item-2">
-                <AccordionTrigger className="text-base font-bold text-[#0F172A] hover:no-underline hover:text-[#2EC4B6]">
-                  How does PitchPleaseAI learn my brand tone?
-                </AccordionTrigger>
-                <AccordionContent className="text-slate-600 leading-relaxed text-sm">
-                  PitchPleaseAI utilizes Retrieval-Augmented Generation (RAG). Your company mission, target audience, preferred tone, and prohibited terms are stored in vector memory and retrieved before every generation pass to ensure 100% brand voice fidelity.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="item-3">
-                <AccordionTrigger className="text-base font-bold text-[#0F172A] hover:no-underline hover:text-[#2EC4B6]">
-                  What platforms can I post to?
-                </AccordionTrigger>
-                <AccordionContent className="text-slate-600 leading-relaxed text-sm">
-                  PitchPleaseAI generates native, platform-specific content for LinkedIn, Twitter / X, and Instagram, matching formatting rules, hashtag conventions, and character limits for each platform.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="item-4">
-                <AccordionTrigger className="text-base font-bold text-[#0F172A] hover:no-underline hover:text-[#2EC4B6]">
-                  Is my business data private?
-                </AccordionTrigger>
-                <AccordionContent className="text-slate-600 leading-relaxed text-sm">
-                  Yes. All user data, brand memories, and content drafts are strictly protected via Supabase Row-Level Security (RLS) at the database layer. Your data is never exposed client-side or shared across tenants.
-                </AccordionContent>
-              </AccordionItem>
-
-              <AccordionItem value="item-5">
-                <AccordionTrigger className="text-base font-bold text-[#0F172A] hover:no-underline hover:text-[#2EC4B6]">
-                  What does it cost?
-                </AccordionTrigger>
-                <AccordionContent className="text-slate-600 leading-relaxed text-sm">
-                  You can get started completely free to experience the multi-agent pipeline and generate your first batch of festival and social campaigns. Upgrades are available for higher posting volumes and team collaboration.
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#8A8A85] mb-4">
+              <span className="text-[#111111]">02 —</span> Meet The Pipeline
+            </div>
+            <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-[#111111] mb-4 tracking-tight">
+              Three agents. One brand voice.
+            </h2>
+            <p className="text-base text-[#4A4A46] leading-relaxed">
+              Every post moves through the same three-stage pipeline before it ever reaches your queue — nothing goes live on autopilot without a check.
+            </p>
           </motion.div>
+
+          <div className="grid sm:grid-cols-3 gap-4">
+            {agents.map((agent, idx) => (
+              <motion.div
+                key={agent.title}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.5, delay: idx * 0.08 }}
+                whileHover={{ y: -6 }}
+                className={`relative overflow-hidden rounded-md p-7 min-h-[260px] flex flex-col justify-end ${agent.theme}`}
+              >
+                <span
+                  className={`absolute -top-6 right-1 font-headline font-black text-[160px] leading-none ${agent.letterColor}`}
+                >
+                  {agent.letter}
+                </span>
+                <div className="relative z-10 text-[10.5px] font-bold uppercase tracking-widest opacity-60 mb-3">
+                  {agent.tag}
+                </div>
+                <h3 className="relative z-10 font-headline font-extrabold text-2xl mb-2">{agent.title}</h3>
+                <p className="relative z-10 text-sm leading-relaxed max-w-[230px]">{agent.desc}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
+      {/* SECTION 3: HOW IT WORKS (numbered flow) */}
+      <section id="how-it-works" className="py-20 md:py-24 relative z-10 bg-white border-t border-[#DBDBD8]">
+        <div className="container mx-auto px-6 max-w-4xl">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6 }}
+            className="mb-10"
+          >
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#8A8A85] mb-4">
+              <span className="text-[#111111]">03 —</span> How It Works
+            </div>
+            <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-[#111111] tracking-tight">
+              From idea to published, in one flow.
+            </h2>
+          </motion.div>
 
+          <div>
+            {howItWorks.map((s, idx) => (
+              <motion.div
+                key={s.idx}
+                initial={{ opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.4, delay: idx * 0.06 }}
+                className="flex items-center gap-6 py-5 border-t border-[#DBDBD8] last:border-b hover:bg-[#F4F4F1]/60 transition-colors"
+              >
+                <div className="text-xs text-[#8A8A85] w-6 flex-shrink-0">{s.idx}</div>
+                <div className="font-headline font-extrabold text-lg sm:text-xl text-[#111111] flex-1">{s.title}</div>
+                <div className="text-xs sm:text-sm text-[#4A4A46] max-w-xs text-right hidden sm:block">{s.desc}</div>
+                <ArrowRight className="w-4 h-4 text-[#8A8A85] flex-shrink-0" />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      {/* Footer */}
-      <footer className="glass-card-strong border-t border-white/30 py-16 relative z-10">
+      {/* SECTION 4: TESTIMONIALS */}
+      <section className="py-20 md:py-24 relative z-10 bg-white border-t border-[#DBDBD8]">
         <div className="container mx-auto px-6 max-w-7xl">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            <div>
-              <Logo size="md" />
-              <p className="text-sm text-[#64748B] mt-4 leading-relaxed">
-                Bridging businesses with growth through AI-powered marketing agents.
-              </p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6 }}
+            className="mb-10 max-w-2xl"
+          >
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#8A8A85] mb-4">
+              <span className="text-[#111111]">04 —</span> Loved By Brands
             </div>
-            <div>
-              <h4 className="font-bold text-sm text-[#0F172A] mb-4">Product</h4>
-              <ul className="space-y-2.5 text-xs font-medium text-[#64748B]">
-                <li><a href="#features" className="hover:text-[#2EC4B6] transition-colors">Features</a></li>
-                <li><a href="#how-it-works" className="hover:text-[#2EC4B6] transition-colors">How It Works</a></li>
-                <li><a href="#faq" className="hover:text-[#2EC4B6] transition-colors">FAQ</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold text-sm text-[#0F172A] mb-4">Core Agents</h4>
-              <ul className="space-y-2.5 text-xs font-medium text-[#64748B]">
-                <li><span className="hover:text-[#2EC4B6]">Researcher Agent</span></li>
-                <li><span className="hover:text-[#2EC4B6]">Creator Agent</span></li>
-                <li><span className="hover:text-[#2EC4B6]">Sentinel Agent</span></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold text-sm text-[#0F172A] mb-4">Security</h4>
-              <ul className="space-y-2.5 text-xs font-medium text-[#64748B]">
-                <li><span className="hover:text-[#2EC4B6]">Supabase RLS</span></li>
-                <li><span className="hover:text-[#2EC4B6]">Serverless Execution</span></li>
-                <li><span className="hover:text-[#2EC4B6]">Brand Memory Security</span></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-slate-200/60 pt-8 text-center text-xs text-[#64748B]">
-            <p>© 2026 PitchPleaseAI. Made with ❤️ for Bharat's entrepreneurs.</p>
+            <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-[#111111] tracking-tight">
+              Don't take our word for it.
+            </h2>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-3 gap-5">
+            {testimonials.map((t, idx) => (
+              <motion.div
+                key={t.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.5, delay: idx * 0.08 }}
+                whileHover={{ y: -3 }}
+                className="bg-white border border-[#DBDBD8] rounded-md p-6 shadow-sm hover:shadow-[0_14px_30px_rgba(10,10,10,0.08)] transition-shadow"
+              >
+                <div className="text-[#C9E200] text-sm tracking-widest mb-4">★★★★★</div>
+                <p className="text-sm text-[#333] leading-relaxed mb-6 min-h-[96px]">"{t.text}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-[#0A0A0A] text-white flex items-center justify-center text-xs font-bold flex-shrink-0">
+                    {t.avatar}
+                  </div>
+                  <div>
+                    <div className="font-headline font-extrabold text-sm text-[#111111]">{t.name}</div>
+                    <div className="text-xs text-[#8A8A85]">{t.business}</div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </footer>
+      </section>
+
+      {/* Contact + Footer — dark full-bleed, matching the bold system */}
+      <section id="contact" className="relative z-10 bg-[#0A0A0A] text-white overflow-hidden">
+        <div
+          className="absolute font-headline font-black text-white/5 pointer-events-none select-none hidden md:block"
+          style={{ fontSize: 220, lineHeight: 1, bottom: -40, right: -10 }}
+        >
+          talk
+        </div>
+        <div className="container mx-auto px-6 max-w-7xl py-20 md:py-24 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-2xl"
+          >
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-white/50 mb-4">
+              <span className="text-white">05 —</span> Get In Touch
+            </div>
+            <h2 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold mb-4 tracking-tight">
+              Let's build your <span className="text-[#E4FF3D]">brand memory.</span>
+            </h2>
+            <p className="text-base text-white/65 leading-relaxed mb-8">
+              Questions, demos, partnership ideas — the team reads everything that comes through. Or just start free and see the pipeline for yourself.
+            </p>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                navigate('/auth?mode=signup');
+              }}
+              className="flex flex-col sm:flex-row gap-0 max-w-lg border-2 border-white rounded-2xl overflow-hidden"
+            >
+              <input
+                type="email"
+                placeholder="you@business.com"
+                className="flex-1 bg-transparent px-5 py-4 text-sm text-white placeholder:text-white/45 focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="px-6 py-4 bg-[#E4FF3D] hover:bg-[#C9E200] text-[#0A0A0A] font-semibold text-sm transition-colors whitespace-nowrap"
+              >
+                Get In Touch
+              </button>
+            </form>
+          </motion.div>
+
+          <div className="border-t border-white/15 mt-16 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <Logo size="md" variant="dark" />
+            <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-2 text-xs font-semibold text-white/60">
+              <a href="#top" className="hover:text-white transition-colors">Product</a>
+              <a href="#pipeline" className="hover:text-white transition-colors">Pipeline</a>
+              <a href="#contact" className="hover:text-white transition-colors">Pricing</a>
+              <Link to="/auth?mode=login" className="hover:text-white transition-colors">Sign In</Link>
+              <span>Privacy</span>
+              <span>Terms</span>
+            </div>
+            <div className="flex items-center gap-5 text-xs font-semibold text-white/60">
+              <span>Instagram</span>
+              <span>LinkedIn</span>
+              <span>X</span>
+            </div>
+          </div>
+          <p className="text-xs text-white/35 mt-8">
+            © 2026 PitchPleaseAI. Made with ❤️ for Bharat's entrepreneurs.
+          </p>
+        </div>
+      </section>
     </div>
-  );
-}
-
-// Helper StepCard component with staggered entrance
-function StepCard({ step, title, tagline, description, delay }: { step: string; title: string; tagline: string; description: string; delay: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      transition={{ duration: 0.6, delay }}
-      whileHover={{ y: -6 }}
-      className="glass-card-strong rounded-3xl p-8 border border-white/40 shadow-[0_16px_48px_rgba(0,0,0,0.08)] relative overflow-hidden flex flex-col justify-between"
-    >
-      <div>
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#2EC4B6] via-[#3DDAD7] to-[#4D9DE0] text-white flex items-center justify-center font-bold text-xl mb-6 shadow-md">
-          {step}
-        </div>
-        <h3 className="text-2xl font-bold text-[#0F172A] mb-1">{title}</h3>
-        <div className="text-xs font-semibold text-[#2EC4B6] uppercase tracking-wider mb-4">
-          {tagline}
-        </div>
-        <p className="text-sm text-[#64748B] leading-relaxed">
-          {description}
-        </p>
-      </div>
-    </motion.div>
   );
 }

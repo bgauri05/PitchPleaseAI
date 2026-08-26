@@ -36,16 +36,16 @@ export function TrustSection() {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full mb-4 border border-[#2EC4B6]/30">
-            <ShieldCheck className="w-4 h-4 text-[#2EC4B6]" />
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#2EC4B6]">
+          <div className="inline-flex items-center gap-2 glass-card px-4 py-2 rounded-full mb-4 border border-[#E4FF3D]/30">
+            <ShieldCheck className="w-4 h-4 text-[#E4FF3D]" />
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#E4FF3D]">
               Enterprise Trust & Security
             </span>
           </div>
-          <h2 className="text-4xl lg:text-5xl font-bold text-[#0F172A] mb-4">
+          <h2 className="text-4xl lg:text-5xl font-bold text-[#111111] mb-4">
             Security Built In, Not Bolted On
           </h2>
-          <p className="text-lg text-[#64748B] max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg text-[#4A4A46] max-w-2xl mx-auto leading-relaxed">
             Your brand data, memory, and credentials are protected with database-enforced security policies and server-side execution.
           </p>
         </motion.div>
@@ -62,27 +62,27 @@ export function TrustSection() {
                 whileHover={{ y: -6 }}
                 className="glass-card-strong rounded-3xl p-8 border border-white/40 shadow-[0_16px_48px_rgba(0,0,0,0.08)] relative overflow-hidden flex flex-col justify-between group"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#2EC4B6]/5 via-transparent to-[#4D9DE0]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#E4FF3D]/5 via-transparent to-[#C9E200]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
                 <div>
                   <div className="flex items-center justify-between mb-6">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#0F172A] to-[#1E293B] text-[#2EC4B6] flex items-center justify-center shadow-md">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#111111] to-[#1E293B] text-[#E4FF3D] flex items-center justify-center shadow-md">
                       <Icon className="w-6 h-6" />
                     </div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#2EC4B6]/10 text-[#2EC4B6] border border-[#2EC4B6]/20">
+                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#E4FF3D]/10 text-[#E4FF3D] border border-[#E4FF3D]/20">
                       {feature.badge}
                     </span>
                   </div>
 
-                  <h3 className="text-xl font-bold text-[#0F172A] mb-3">
+                  <h3 className="text-xl font-bold text-[#111111] mb-3">
                     {feature.title}
                   </h3>
-                  <p className="text-[#64748B] text-sm leading-relaxed mb-6">
+                  <p className="text-[#4A4A46] text-sm leading-relaxed mb-6">
                     {feature.description}
                   </p>
                 </div>
 
-                <div className="pt-4 border-t border-slate-200/50 text-xs font-semibold text-[#2EC4B6] flex items-center gap-2">
+                <div className="pt-4 border-t border-slate-200/50 text-xs font-semibold text-[#E4FF3D] flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4" />
                   <span>Verified Security Constraint</span>
                 </div>

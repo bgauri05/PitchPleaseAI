@@ -1,1 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+/* Aug 2026 "Bold" redesign — Archivo (900 for display headlines) replaces
+   Unbounded; Inter stays for body/UI. Matches index.html's <link>. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Archivo:wght@400;500;600;700;800;900&display=swap');

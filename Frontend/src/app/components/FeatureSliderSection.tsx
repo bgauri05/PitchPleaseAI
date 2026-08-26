@@ -8,36 +8,36 @@ export function FeatureSliderSection() {
   const slides = [
     {
       id: 1,
-      gridColor: 'bg-[#16a34a]', // Vibrant green grid theme matching screenshot 2
-      gridPatternColor: 'rgba(255,255,255,0.22)',
+      gridColor: 'bg-[#0A0A0A]', // Black theme — bold system
+      gridPatternColor: 'rgba(255,255,255,0.10)',
       titleBadge: 'Create 6,000 hyper-personalized emails & posts within minutes',
       statValue: '11x',
       statLabel: 'CLICK-THROUGH RATE',
-      statBg: 'bg-[#1d4ed8] text-white',
+      statBg: 'bg-[#E4FF3D] text-[#0A0A0A]',
       personImg: '/slide_person_2.png',
-      accentColor: '#ec4899',
+      accentColor: '#E4FF3D',
     },
     {
       id: 2,
-      gridColor: 'bg-[#0284c7]', // Blue grid theme
-      gridPatternColor: 'rgba(255,255,255,0.22)',
+      gridColor: 'bg-[#E4FF3D]', // Yellow theme — bold system
+      gridPatternColor: 'rgba(10,10,10,0.10)',
       titleBadge: 'Optimize 2,000 web pages & social campaigns for search, instantly',
       statValue: '+67%',
       statLabel: 'ORGANIC TRAFFIC',
-      statBg: 'bg-[#22c55e] text-[#052e16]',
+      statBg: 'bg-[#0A0A0A] text-white',
       personImg: '/slide_person_1.png',
-      accentColor: '#facc15',
+      accentColor: '#0A0A0A',
     },
     {
       id: 3,
-      gridColor: 'bg-[#9333ea]', // Purple grid theme
-      gridPatternColor: 'rgba(255,255,255,0.22)',
+      gridColor: 'bg-[#111111]', // Ink theme — bold system
+      gridPatternColor: 'rgba(228,255,61,0.14)',
       titleBadge: 'Auto-pilot festival marketing & regional Hindi campaigns in seconds',
       statValue: '99.2%',
       statLabel: 'BRAND VOICE FIDELITY',
-      statBg: 'bg-[#f59e0b] text-[#451a03]',
+      statBg: 'bg-[#C9E200] text-[#0A0A0A]',
       personImg: '/slide_person_3.png',
-      accentColor: '#06b6d4',
+      accentColor: '#C9E200',
     },
   ];
 
@@ -85,7 +85,7 @@ export function FeatureSliderSection() {
             {/* Green Circles Vertical Motif (Left Side) */}
             <div className="absolute left-10 bottom-0 hidden lg:flex flex-col gap-3 z-10 pointer-events-none opacity-85">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="w-12 h-12 rounded-full bg-[#15803d]" />
+                <div key={i} className="w-12 h-12 rounded-full bg-white/20" />
               ))}
             </div>
 
@@ -107,7 +107,7 @@ export function FeatureSliderSection() {
                 transition={{ delay: 0.2 }}
                 className="bg-white rounded-2xl p-5 sm:p-6 shadow-2xl border border-slate-100 max-w-xs sm:max-w-sm flex items-start gap-3 relative z-30"
               >
-                <div className="w-7 h-7 rounded-full bg-[#b51d0d] text-white flex items-center justify-center text-xs font-black shrink-0 mt-0.5 shadow-xs">
+                <div className="w-7 h-7 rounded-full bg-[#0A0A0A] text-white flex items-center justify-center text-xs font-black shrink-0 mt-0.5 shadow-xs">
                   j
                 </div>
                 <p className="font-serif text-base sm:text-lg font-medium text-slate-900 leading-snug">

@@ -71,12 +71,12 @@ from pydantic import BaseModel, Field, HttpUrl
 #     • Literal["linkedin", …] is repeated inline because Pydantic V2 needs
 #       the literal annotation on the field itself for JSON Schema generation.
 
-ALLOWED_PLATFORMS = {"linkedin", "twitter", "instagram"}
+ALLOWED_PLATFORMS = {"linkedin", "twitter", "instagram", "facebook", "whatsapp", "email"}
 
 from typing import Literal  # noqa: E402 — grouped with typing imports above
 
-PlatformStr = Literal["linkedin", "twitter", "instagram"]
-"""Type alias — only these three string values pass validation."""
+PlatformStr = Literal["linkedin", "twitter", "instagram", "facebook", "whatsapp", "email"]
+"""Type alias — only these six string values pass validation."""
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -129,8 +129,8 @@ class ContentRequest(BaseModel):
     platforms: List[PlatformStr] = Field(
         ...,
         min_length=1,
-        max_length=3,
-        description="Target platforms. Allowed: 'linkedin', 'twitter', 'instagram'.",
+        max_length=6,
+        description="Target platforms. Allowed: 'linkedin', 'twitter', 'instagram', 'facebook', 'whatsapp', 'email'.",
     )
 
     # ── tone_override (optional) ─────────────────────────────────────────
@@ -209,6 +209,14 @@ class BusinessSetupRequest(BaseModel):
     business_id: Optional[str] = Field(
         default=None,
         description="Optional UUID of existing business to update.",
+    )
+    user_id: Optional[str] = Field(
+        default=None,
+        description=(
+            "Supabase auth.users.id of the account performing setup, so the "
+            "businesses row can be owned by (and later recovered by) that "
+            "account. Optional so anonymous/local setup keeps working."
+        ),
     )
     business_name: Optional[str] = Field(
         default=None,

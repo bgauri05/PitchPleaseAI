@@ -17,8 +17,8 @@ const API_KEY = import.meta.env.VITE_API_KEY as string;
 
 // ── TypeScript Interfaces ────────────────────────────────────────────────────
 
-/** The three platform keys the backend pipeline accepts (lowercase, validated as Literals). */
-export type BackendPlatform = 'linkedin' | 'twitter' | 'instagram';
+/** The platform keys the backend pipeline accepts (lowercase, validated as Literals). */
+export type BackendPlatform = 'linkedin' | 'twitter' | 'instagram' | 'facebook' | 'whatsapp' | 'email';
 
 /** Request body sent to POST /content/generate */
 export interface ContentRequest {

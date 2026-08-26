@@ -23,9 +23,8 @@
     "noFallthroughCasesInSwitch": true,
 
     /* Path alias — mirrors the `@` alias defined in vite.config.ts */
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src"]

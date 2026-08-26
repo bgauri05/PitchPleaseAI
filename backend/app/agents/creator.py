@@ -160,6 +160,12 @@ COPY rules (per platform):
   • Instagram — emotion-first, lifestyle/visual story.
                Include 5–10 relevant hashtags at the end. Use line
                breaks for readability. Add a CTA in the last line.
+  • Facebook  — engaging community story, friendly & approachable tone (~500 chars).
+               Include 2-3 relevant hashtags and a clear call-to-action.
+  • WhatsApp  — direct, high-impact broadcast message style.
+               Use clean formatting with bullet points and emojis. Short & punchy with direct action link hint.
+  • Email     — structured email newsletter or marketing blast.
+               Must include: Subject Line, Preheader, engaging Body copy, and a clear Call-to-Action button label.
 
 IMAGE PROMPT rules (apply to EVERY platform):
   Each image_prompt must be a single detailed paragraph (60–120 words) \
@@ -175,6 +181,9 @@ Midjourney / DALL-E 3) can render directly. Include ALL of:
         LinkedIn  → clean corporate office / neutral tones / crisp DOF
         Twitter/X → bold high-contrast / graphic / eye-catching
         Instagram → cinematic lifestyle / warm tones / shallow DOF
+        Facebook  → vibrant community & social banner style / inviting lighting
+        WhatsApp  → clean product spotlight / eye-level promo visual
+        Email     → wide header hero visual / polished studio lighting
     • NO text overlays, watermarks, or logos in the description.
 
 {revision_block}

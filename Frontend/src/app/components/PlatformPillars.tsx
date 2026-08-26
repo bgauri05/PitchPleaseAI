@@ -17,13 +17,13 @@ export function PlatformPillars() {
       icon: Brain,
       title: 'Brand Voice Engine',
       description: 'Our proprietary model filters out generic AI speak, ensuring every drafted word aligns perfectly with your established tone.',
-      badgeColor: 'bg-[#136948]/10 text-[#136948]',
+      badgeColor: 'bg-[#3AA36B]/10 text-[#3AA36B]',
     },
     {
       icon: Rocket,
       title: 'Omnichannel Export',
       description: 'Generate tailored assets for Instagram, LinkedIn, and email sequences simultaneously from a single central brief.',
-      badgeColor: 'bg-[#f2b705]/15 text-[#9c7600]',
+      badgeColor: 'bg-[#C9E200]/15 text-[#9c7600]',
     },
   ];
 
@@ -36,10 +36,10 @@ export function PlatformPillars() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1d1b19] mb-4">
+          <h2 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-bold text-[#111111] mb-4">
             The Intelligent Bridge
           </h2>
-          <p className="font-body text-base sm:text-lg text-[#5b403c] max-w-2xl mx-auto leading-relaxed">
+          <p className="font-body text-base sm:text-lg text-[#4A4A46] max-w-2xl mx-auto leading-relaxed">
             Three pillars designed to transform your raw knowledge into impactful creative at scale.
           </p>
         </motion.div>
@@ -54,15 +54,15 @@ export function PlatformPillars() {
                 animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
                 transition={{ duration: 0.5, delay: index * 0.15 }}
                 whileHover={{ y: -4 }}
-                className="bg-white rounded-2xl p-8 shadow-[0_8px_24px_rgba(18,17,15,0.08)] hover:shadow-[0_12px_32px_rgba(18,17,15,0.12)] transition-all duration-300 border border-[#ece7e3] flex flex-col gap-4"
+                className="bg-white rounded-2xl p-8 shadow-[0_8px_24px_rgba(18,17,15,0.08)] hover:shadow-[0_12px_32px_rgba(18,17,15,0.12)] transition-all duration-300 border border-[#DBDBD8] flex flex-col gap-4"
               >
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${pillar.badgeColor}`}>
                   <Icon className="w-6 h-6" />
                 </div>
-                <h3 className="font-headline text-2xl font-bold text-[#1d1b19]">
+                <h3 className="font-headline text-2xl font-bold text-[#111111]">
                   {pillar.title}
                 </h3>
-                <p className="font-body text-[#5b403c] text-sm leading-relaxed flex-grow">
+                <p className="font-body text-[#4A4A46] text-sm leading-relaxed flex-grow">
                   {pillar.description}
                 </p>
               </motion.div>

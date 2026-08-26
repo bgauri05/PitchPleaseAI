@@ -40,12 +40,12 @@ export function CapabilityBar() {
                 transition={{ duration: 0.4, delay: index * 0.1 }}
                 className="flex items-center gap-3"
               >
-                <div className="w-10 h-10 rounded-xl bg-[#b51d0d]/10 flex items-center justify-center text-[#b51d0d] flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-[#0A0A0A]/10 flex items-center justify-center text-[#0A0A0A] flex-shrink-0">
                   <Icon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-[#1d1b19]">{item.title}</h4>
-                  <p className="text-xs text-[#5b403c]">{item.description}</p>
+                  <h4 className="text-sm font-bold text-[#111111]">{item.title}</h4>
+                  <p className="text-xs text-[#4A4A46]">{item.description}</p>
                 </div>
               </motion.div>
             );

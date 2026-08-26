@@ -174,7 +174,7 @@ def create_app() -> FastAPI:
 
 #   `app`     — used by `uvicorn app.main:app --reload`
 #   `handler` — used by AWS Lambda via Mangum
-app = create_app()
+app = create_app()  # Reloaded with new Meta App credentials 925067427319541
 
 # WHAT:  Mangum wraps the ASGI FastAPI app so AWS Lambda can invoke it.
 # HOW:   API Gateway / ALB sends an event dict → Mangum converts it into

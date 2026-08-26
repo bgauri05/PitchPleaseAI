@@ -9,9 +9,9 @@ export function DashboardLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, profile, signOut } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const displayName = profile?.business_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
+  const displayName = profile?.business_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'My Business';
   const initials = displayName.slice(0, 2).toUpperCase();
   const email = user?.email || '';
 
@@ -22,8 +22,8 @@ export function DashboardLayout() {
 
   const navItems = [
     { path: '/app', label: 'Dashboard', icon: Home },
-    { path: '/app/generate', label: 'Generate Content', icon: Sparkles },
-    { path: '/app/planner', label: 'Weekly Planner', icon: Calendar },
+    { path: '/app/generate', label: 'Content Generator', icon: Sparkles },
+    { path: '/app/planner', label: 'Weekly Scheduler', icon: Calendar },
     { path: '/app/festivals', label: 'Festival Ideas', icon: PartyPopper },
     { path: '/app/library', label: 'Content Library', icon: FolderOpen },
     { path: '/app/scheduled', label: 'Scheduled Posts', icon: Send },
@@ -38,16 +38,18 @@ export function DashboardLayout() {
 
   const getBreadcrumbs = () => {
     const paths = location.pathname.split('/').filter(Boolean);
-    const breadcrumbs = [{ label: 'Home', path: '/app' }];
-    
+    const breadcrumbs = [{ label: 'Dashboard', path: '/app' }];
+
     if (paths.length > 1) {
       const currentPath = paths[paths.length - 1];
       const item = navItems.find(nav => nav.path.endsWith(currentPath));
       if (item) {
         breadcrumbs.push({ label: item.label, path: item.path });
+      } else if (currentPath === 'settings') {
+        breadcrumbs.push({ label: 'Brand Settings', path: '/app/settings' });
       }
     }
-    
+
     return breadcrumbs;
   };
 
@@ -55,167 +57,158 @@ export function DashboardLayout() {
   const showBackButton = location.pathname !== '/app';
 
   return (
-    <div className="min-h-screen flex bg-[#fef8f4] text-[#1d1b19]">
-      {/* Mobile Sidebar Overlay */}
+    <div className="min-h-screen flex flex-col bg-[#F4F4F1] text-[#111111] font-body w-full">
+      {/* Top Header / Bar */}
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#DBDBD8]/40 px-6 py-4 flex items-center justify-between shadow-xs w-full gap-4">
+        <div className="flex items-center gap-4 shrink-0">
+          <Logo size="md" />
+        </div>
+
+        {/* Nav Links (desktop/tablet) */}
+        <nav className="hidden md:flex items-center gap-1 bg-[#F4F4F1] p-1 rounded-2xl border border-[#DBDBD8]/60 overflow-x-auto">
+          {navItems.map((item) => {
+            const active = isActive(item.path);
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                  active
+                    ? 'bg-[#0A0A0A] text-white shadow-xs'
+                    : 'text-[#4A4A46] hover:text-[#111111] hover:bg-white'
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Account Menu / Notification */}
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            onClick={() => navigate('/app/scheduled')}
+            className="p-2 text-[#4A4A46] hover:text-[#111111] hover:bg-[#F4F4F1] rounded-xl transition-all relative hidden sm:inline-flex"
+            title="Notifications"
+          >
+            <Bell className="w-5 h-5" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#0A0A0A] rounded-full" />
+          </button>
+
+          <Link
+            to="/app/settings"
+            className="hidden sm:flex items-center gap-2 p-1.5 pr-3 hover:bg-[#F4F4F1] rounded-full transition-all border border-[#DBDBD8]/40"
+          >
+            <div className="w-7 h-7 bg-[#0A0A0A] rounded-full flex items-center justify-center text-white text-xs font-bold shadow-xs">
+              {initials}
+            </div>
+            <span className="text-xs font-bold text-[#111111] hidden lg:inline">{displayName}</span>
+          </Link>
+
+          {/* Mobile menu toggle */}
+          <button
+            onClick={() => setMobileMenuOpen((open) => !open)}
+            className="md:hidden text-[#4A4A46] hover:text-[#111111] p-2 hover:bg-[#F4F4F1] rounded-xl transition-all"
+          >
+            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Nav Dropdown */}
       <AnimatePresence>
-        {sidebarOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSidebarOpen(false)}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
-          />
+        {mobileMenuOpen && (
+          <motion.nav
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="md:hidden overflow-hidden bg-white/95 backdrop-blur-md border-b border-[#DBDBD8]/40 w-full"
+          >
+            <div className="p-4 space-y-1.5">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const active = isActive(item.path);
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                      active
+                        ? 'bg-[#0A0A0A] text-white font-semibold'
+                        : 'text-[#4A4A46] hover:text-[#111111] hover:bg-[#F4F4F1]'
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+              <Link
+                to="/app/settings"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  isActive('/app/settings')
+                    ? 'bg-[#0A0A0A] text-white font-semibold'
+                    : 'text-[#4A4A46] hover:text-[#111111] hover:bg-[#F4F4F1]'
+                }`}
+              >
+                <Settings className="w-5 h-5" />
+                <span>Brand Settings</span>
+              </Link>
+            </div>
+
+            <div className="p-4 border-t border-[#DBDBD8]">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-[#F4F4F1] border border-[#DBDBD8]/30">
+                <div className="w-10 h-10 bg-[#0A0A0A] rounded-full flex items-center justify-center text-white font-bold text-sm shadow-xs">
+                  {initials}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold text-[#111111] truncate">{displayName}</p>
+                  <p className="text-xs text-[#4A4A46] truncate">{email}</p>
+                </div>
+                <button
+                  onClick={handleSignOut}
+                  className="p-1.5 text-[#4A4A46] hover:text-[#0A0A0A] hover:bg-white rounded-lg transition-colors"
+                  title="Sign Out"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </motion.nav>
         )}
       </AnimatePresence>
 
-      {/* Sidebar */}
-      <motion.aside
-        initial={false}
-        animate={{ x: sidebarOpen ? 0 : -300 }}
-        className="fixed lg:sticky top-0 left-0 h-screen w-64 bg-white/90 backdrop-blur-md border-r border-[#e4beb7]/40 flex flex-col z-50 lg:translate-x-0 transition-transform shadow-[0_8px_32px_rgba(18,17,15,0.06)]"
-      >
-        {/* Logo Section */}
-        <div className="p-6 border-b border-[#e6e2de] flex items-center justify-between">
-          <Logo size="md" />
+      {/* Breadcrumb bar */}
+      <div className="w-full px-6 md:px-8 pt-4 flex items-center gap-2 text-sm text-[#4A4A46]">
+        {showBackButton && (
           <button
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-[#5b403c] hover:text-[#1d1b19] p-2 hover:bg-[#f8f3ef] rounded-xl transition-all"
+            onClick={() => navigate(-1)}
+            className="mr-1 p-1 text-[#4A4A46] hover:text-[#111111] hover:bg-[#F4F4F1] rounded-lg transition-all"
           >
-            <X className="w-6 h-6" />
+            <ArrowLeft className="w-4 h-4" />
           </button>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4 overflow-y-auto">
-          <div className="space-y-1.5">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const active = isActive(item.path);
-              return (
-                <motion.div
-                  key={item.path}
-                  whileHover={{ x: 4 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Link
-                    to={item.path}
-                    onClick={() => setSidebarOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all relative overflow-hidden group text-sm font-medium ${
-                      active
-                        ? 'text-white'
-                        : 'text-[#5b403c] hover:text-[#1d1b19]'
-                    }`}
-                  >
-                    {active && (
-                      <motion.div
-                        layoutId="activeNav"
-                        className="absolute inset-0 bg-[#b51d0d] rounded-xl shadow-sm"
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                      />
-                    )}
-                    {!active && (
-                      <div className="absolute inset-0 bg-[#f8f3ef] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                    )}
-                    <Icon className="w-5 h-5 relative z-10" />
-                    <span className="relative z-10">{item.label}</span>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          <div className="mt-8 pt-8 border-t border-[#e6e2de] space-y-1.5">
-            <motion.div whileHover={{ x: 4 }} whileTap={{ scale: 0.98 }}>
-              <Link
-                to="/app/settings"
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-[#5b403c] hover:text-[#1d1b19] hover:bg-[#f8f3ef] transition-all"
-              >
-                <Settings className="w-5 h-5" />
-                <span>Settings</span>
-              </Link>
-            </motion.div>
-          </div>
-        </nav>
-
-        {/* User Section */}
-        <div className="p-4 border-t border-[#e6e2de]">
-          <motion.div 
-            className="flex items-center gap-3 p-3 rounded-xl bg-[#f8f3ef] border border-[#e4beb7]/30"
-            whileHover={{ scale: 1.02 }}
-          >
-            <div className="w-10 h-10 bg-[#b51d0d] rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-sm">
-              {initials}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-[#1d1b19] truncate">{displayName}</p>
-              <p className="text-xs text-[#5b403c] truncate">{email}</p>
-            </div>
-            <button
-              onClick={handleSignOut}
-              className="p-1.5 text-[#5b403c] hover:text-[#b51d0d] hover:bg-white rounded-lg transition-colors"
-              title="Sign Out"
+        )}
+        {breadcrumbs.map((crumb, index) => (
+          <div key={crumb.path} className="flex items-center gap-2">
+            {index > 0 && <ChevronRight className="w-4 h-4 text-[#DBDBD8]" />}
+            <Link
+              to={crumb.path}
+              className={`hover:text-[#0A0A0A] transition-colors ${
+                index === breadcrumbs.length - 1 ? 'font-bold text-[#111111]' : ''
+              }`}
             >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </motion.div>
-        </div>
-      </motion.aside>
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Header */}
-        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-[#e4beb7]/40 px-6 py-4 flex items-center justify-between shadow-xs">
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden text-[#5b403c] hover:text-[#1d1b19] p-2 hover:bg-[#f8f3ef] rounded-xl transition-all"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-
-            {/* Breadcrumbs */}
-            <div className="flex items-center gap-2 text-sm text-[#5b403c]">
-              {showBackButton && (
-                <button
-                  onClick={() => navigate(-1)}
-                  className="mr-2 p-1 text-[#5b403c] hover:text-[#1d1b19] hover:bg-[#f8f3ef] rounded-lg transition-all"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                </button>
-              )}
-              {breadcrumbs.map((crumb, index) => (
-                <div key={crumb.path} className="flex items-center gap-2">
-                  {index > 0 && <ChevronRight className="w-4 h-4 text-[#e4beb7]" />}
-                  <Link
-                    to={crumb.path}
-                    className={`hover:text-[#1d1b19] transition-colors ${
-                      index === breadcrumbs.length - 1 ? 'font-semibold text-[#1d1b19]' : ''
-                    }`}
-                  >
-                    {crumb.label}
-                  </Link>
-                </div>
-              ))}
-            </div>
+              {crumb.label}
+            </Link>
           </div>
-
-          <div className="flex items-center gap-3">
-            <button className="p-2 text-[#5b403c] hover:text-[#1d1b19] hover:bg-[#f8f3ef] rounded-xl transition-all relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#b51d0d] rounded-full" />
-            </button>
-            <div className="w-8 h-8 bg-[#b51d0d] rounded-full flex items-center justify-center text-white text-xs font-semibold">
-              {initials}
-            </div>
-          </div>
-        </header>
-
-        {/* Page Content */}
-        <main className="flex-1 p-6 md:p-8 max-w-7xl w-full mx-auto">
-          <Outlet />
-        </main>
+        ))}
       </div>
+
+      {/* Page Content */}
+      <main className="flex-1 w-full p-6 md:p-8">
+        <Outlet />
+      </main>
     </div>
   );
 }

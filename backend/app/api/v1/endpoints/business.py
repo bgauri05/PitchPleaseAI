@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import base64
 import os
 import uuid
 import logging
 from typing import List, Optional, Dict
 from fastapi import APIRouter, File, UploadFile, HTTPException, Body
+from pydantic import BaseModel
 from app.models.schemas import BusinessSetupRequest, BusinessProfileResponse
 from app.services.supabase import get_supabase_client
 from app.services.brand_memory import (
@@ -44,6 +46,43 @@ async def upload_asset(file: UploadFile = File(...)):
     return {"filename": filename, "url": public_url}
 
 
+class SaveGeneratedImageRequest(BaseModel):
+    image_base64: str
+    extension: str = ".png"
+
+
+@router.post("/save-generated-image")
+async def save_generated_image(request: SaveGeneratedImageRequest):
+    """Persist a base64 AI-generated image to disk and return its public URL.
+
+    WHAT: apiClient.generateImage() (Frontend/src/lib/api.ts) returns raw
+          base64 image data that's only ever shown in-browser — it's never
+          saved anywhere with a real URL. Instagram's Content Publishing
+          API requires a public image_url for every post (there is no
+          text-only post type). This endpoint closes that gap by reusing
+          the same disk-save pattern as upload_asset() above, just
+          accepting base64 bytes instead of a multipart file upload.
+    NOTE: The returned "/uploads/..." URL is only actually fetchable by
+          Meta's servers once this backend is deployed with a public
+          domain — on localhost it will save and serve fine for local
+          testing (viewable in a browser pointed at the backend), but a
+          real Instagram publish call against it will still fail with a
+          network error until deployment. See instagram_publish.py.
+    """
+    try:
+        image_bytes = base64.b64decode(request.image_base64)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid base64 image data.")
+
+    filename = f"{uuid.uuid4()}{request.extension}"
+    filepath = os.path.join(UPLOAD_DIR, filename)
+
+    with open(filepath, "wb") as f:
+        f.write(image_bytes)
+
+    return {"filename": filename, "url": f"/uploads/{filename}"}
+
+
 @router.post("/setup")
 async def setup_business(request: BusinessSetupRequest):
     """Create or update a Business Brand Memory profile."""
@@ -69,6 +108,15 @@ async def setup_business(request: BusinessSetupRequest):
         "ai_instructions": request.ai_instructions or "",
         "tone": voice_str,
     }
+
+    # WHAT: ties this business to the authenticated account that set it up.
+    # WHY: previously never written, so `businesses.user_id` was always null
+    # even though the column + FK exist (migration 003) — the app only
+    # linked account -> business via `profiles.business_id`. This closes
+    # that gap. Only set when present so a call without it (e.g. a stale
+    # session) doesn't null out an owner set by a prior call.
+    if request.user_id:
+        payload["user_id"] = request.user_id
 
     result = await upsert_business_profile(payload)
 

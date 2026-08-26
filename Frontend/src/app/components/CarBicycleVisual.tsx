@@ -8,21 +8,21 @@ export function CarBicycleVisual() {
       
       {/* Top Background Decorative Glow */}
       <div className="absolute top-0 right-0 w-40 h-40 bg-[#facc15]/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#b51d0d]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-40 h-40 bg-[#0A0A0A]/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Top Banner Caption */}
       <div className="mb-4 relative z-10 w-full">
-        <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#b51d0d] to-[#dc2626] text-white text-[11px] sm:text-xs font-mono font-bold uppercase tracking-widest px-3.5 py-1 rounded-full mb-3 shadow-sm">
+        <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-[#0A0A0A] to-[#dc2626] text-white text-[11px] sm:text-xs font-mono font-bold uppercase tracking-widest px-3.5 py-1 rounded-full mb-3 shadow-sm">
           <Sparkles className="w-3.5 h-3.5 text-[#facc15]" />
           <span>The Marketing Dilemma</span>
         </div>
         
-        <h3 className="font-headline text-2xl sm:text-3xl font-extrabold text-[#1d1b19] leading-tight uppercase tracking-tight">
+        <h3 className="font-headline text-2xl sm:text-3xl font-extrabold text-[#111111] leading-tight uppercase tracking-tight">
           Brand Without<br />
-          <span className="text-[#b51d0d] font-serif italic text-3xl sm:text-4xl underline decoration-[#facc15] decoration-wavy decoration-2">
+          <span className="text-[#0A0A0A] font-serif italic text-3xl sm:text-4xl underline decoration-[#facc15] decoration-wavy decoration-2">
             Digital Marketing
           </span><br />
-          <span className="bg-[#1d1b19] text-[#facc15] px-3 py-1 rounded-xl text-xl sm:text-2xl mt-1.5 inline-block shadow-md border border-[#38332e]">
+          <span className="bg-[#111111] text-[#facc15] px-3 py-1 rounded-xl text-xl sm:text-2xl mt-1.5 inline-block shadow-md border border-[#38332e]">
             Just Looks Like This
           </span>
         </h3>
@@ -47,7 +47,7 @@ export function CarBicycleVisual() {
           xmlns="http://www.w3.org/2000/svg"
         >
           {/* Ground Shadow */}
-          <ellipse cx="225" cy="245" rx="170" ry="10" fill="#1d1b19" opacity="0.15" />
+          <ellipse cx="225" cy="245" rx="170" ry="10" fill="#111111" opacity="0.15" />
 
           {/* VISIBLE BICYCLE FRAME UNDER THE CAR (Vibrant Orange & Yellow Chassis) */}
           <g>
@@ -150,13 +150,13 @@ export function CarBicycleVisual() {
 
       {/* Bottom Solution Box & CTA */}
       <div className="mt-2 pt-4 border-t border-[#fca5a5]/50 relative z-10 w-full text-center bg-white/80 backdrop-blur-xs p-4 rounded-2xl border border-white/60 shadow-xs">
-        <p className="font-body text-xs sm:text-sm font-semibold text-[#1d1b19] leading-relaxed mb-3">
-          Our <span className="text-[#b51d0d] font-bold">AI marketing agents</span> actually know your brand voice & festival calendar to put your growth in full gear.
+        <p className="font-body text-xs sm:text-sm font-semibold text-[#111111] leading-relaxed mb-3">
+          Our <span className="text-[#0A0A0A] font-bold">AI marketing agents</span> actually know your brand voice & festival calendar to put your growth in full gear.
         </p>
 
         <Link
           to="/setup"
-          className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#b51d0d] to-[#dc2626] hover:from-[#d83824] hover:to-[#ef4444] text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all duration-200 group"
+          className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#0A0A0A] to-[#dc2626] hover:from-[#262626] hover:to-[#ef4444] text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all duration-200 group"
         >
           <span>Get AI Agents Now</span>
           <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

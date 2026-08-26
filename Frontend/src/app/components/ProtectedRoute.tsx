@@ -22,8 +22,8 @@ export function ProtectedRoute() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#fef8f4]">
-        <Loader2 className="w-8 h-8 animate-spin text-[#b51d0d]" />
+      <div className="flex items-center justify-center h-screen bg-[#F4F4F1]">
+        <Loader2 className="w-8 h-8 animate-spin text-[#0A0A0A]" />
       </div>
     );
   }

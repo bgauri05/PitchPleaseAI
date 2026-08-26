@@ -13,11 +13,14 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { supabase } from '@/lib/supabase';
+import { auth } from '@/lib/firebase';
 
 export function BusinessSetup() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialBusinessName = searchParams.get('business_name') || searchParams.get('brand_name') || '';
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
@@ -61,7 +64,7 @@ export function BusinessSetup() {
   const productImagesInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
-    business_name: '',
+    business_name: initialBusinessName,
     industry: '',
     business_description: '',
     brand_voice: [] as string[],
@@ -277,6 +280,15 @@ export function BusinessSetup() {
     const existingId = localStorage.getItem('business_id') || crypto.randomUUID();
     localStorage.setItem('business_id', existingId);
 
+    // WHAT: read here (not just later, for the `profiles` upsert) so
+    // `/business/setup` can also link `businesses.user_id` to whoever is
+    // logged in — previously that column was never set at all, so a
+    // business existed with no owning account even though the FK exists.
+    // `auth.currentUser` (Firebase) is synchronous — no await needed, unlike
+    // Supabase's `getUser()`, since Firebase keeps the current user cached
+    // in memory once AuthContext's onAuthStateChanged has fired once.
+    const user = auth.currentUser;
+
     try {
       const response = await fetch(`${API_BASE}/business/setup`, {
         method: 'POST',
@@ -286,6 +298,7 @@ export function BusinessSetup() {
         },
         body: JSON.stringify({
           business_id: existingId,
+          user_id: user?.uid ?? null,
           business_name: formData.business_name,
           industry: formData.industry,
           business_description: formData.business_description,
@@ -316,10 +329,10 @@ export function BusinessSetup() {
       // the next login. Safe to skip silently for an anonymous session —
       // business setup itself still works without an account, same as
       // before; this only wires up the *account-based* return-user flow.
-      const { data: { user } } = await supabase.auth.getUser();
+      // (`user` is the same session fetched above, before the POST.)
       if (user) {
         await supabase.from('profiles').upsert({
-          id: user.id,
+          id: user.uid,
           business_id: finalBusinessId,
           business_name: formData.business_name,
           industry: formData.industry,
@@ -345,11 +358,11 @@ export function BusinessSetup() {
   const progressPercent = Math.round((step / 4) * 100);
 
   return (
-    <div className="min-h-screen bg-[#fef8f4] text-[#1d1b19] flex flex-col font-body antialiased relative overflow-hidden">
+    <div className="min-h-screen bg-[#F4F4F1] text-[#111111] flex flex-col font-body antialiased relative overflow-hidden">
       {/* Top Thin Progress Bar */}
-      <div className="fixed top-0 left-0 w-full h-1.5 bg-[#ece7e3] z-50">
+      <div className="fixed top-0 left-0 w-full h-1.5 bg-[#DBDBD8] z-50">
         <div
-          className="h-full bg-[#b51d0d] transition-all duration-500 ease-in-out rounded-r-full shadow-[0_0_8px_rgba(181,29,13,0.4)]"
+          className="h-full bg-[#0A0A0A] transition-all duration-500 ease-in-out rounded-r-full shadow-[0_0_8px_rgba(181,29,13,0.4)]"
           style={{ width: `${progressPercent}%` }}
         />
       </div>
@@ -360,7 +373,7 @@ export function BusinessSetup() {
           <button
             onClick={handleBack}
             aria-label="Go back"
-            className="p-2.5 rounded-full text-[#5b403c] bg-white border border-[#e4beb7] hover:bg-[#f8f3ef] hover:text-[#1d1b19] transition-all flex items-center gap-2 shadow-sm text-sm font-medium"
+            className="p-2.5 rounded-full text-[#4A4A46] bg-white border border-[#DBDBD8] hover:bg-[#F4F4F1] hover:text-[#111111] transition-all flex items-center gap-2 shadow-sm text-sm font-medium"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back</span>
@@ -369,10 +382,10 @@ export function BusinessSetup() {
           <div />
         )}
 
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#5b403c]">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#4A4A46]">
           <span>Step {step} of 4</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-[#b51d0d]" />
-          <span className="text-[#1d1b19]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#0A0A0A]" />
+          <span className="text-[#111111]">
             {step === 1 && 'Business Info'}
             {step === 2 && 'Brand Identity'}
             {step === 3 && 'Brand Assets'}
@@ -382,7 +395,7 @@ export function BusinessSetup() {
 
         <button
           onClick={() => navigate('/app')}
-          className="text-xs font-medium text-[#8f706a] hover:text-[#b51d0d] transition-colors"
+          className="text-xs font-medium text-[#8A8A85] hover:text-[#0A0A0A] transition-colors"
         >
           Skip for now
         </button>
@@ -396,20 +409,20 @@ export function BusinessSetup() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -15 }}
           transition={{ duration: 0.3 }}
-          className="w-full bg-white rounded-[28px] p-6 md:p-10 shadow-[0_12px_32px_rgba(18,17,15,0.08)] border border-[#ece7e3]"
+          className="w-full bg-white rounded-[28px] p-6 md:p-10 shadow-[0_12px_32px_rgba(18,17,15,0.08)] border border-[#DBDBD8]"
         >
           {/* STEP 1: Business Information */}
           {step === 1 && (
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-[#fef8f4] rounded-2xl flex items-center justify-center border border-[#e4beb7]/40 text-[#b51d0d]">
+                <div className="w-12 h-12 bg-[#F4F4F1] rounded-2xl flex items-center justify-center border border-[#DBDBD8]/40 text-[#0A0A0A]">
                   <Store className="w-6 h-6" />
                 </div>
                 <div>
-                  <h1 className="font-headline text-2xl md:text-3xl font-bold text-[#1d1b19]">
+                  <h1 className="font-headline text-2xl md:text-3xl font-bold text-[#111111]">
                     Step 1 – Business Information
                   </h1>
-                  <p className="text-sm text-[#5b403c]">
+                  <p className="text-sm text-[#4A4A46]">
                     Tell us about your brand so AI can tailor every post to your business.
                   </p>
                 </div>
@@ -417,8 +430,8 @@ export function BusinessSetup() {
 
               <div className="space-y-5 mt-6">
                 <div>
-                  <label className="block text-xs font-semibold text-[#1d1b19] mb-1.5 uppercase tracking-wider">
-                    Business Name <span className="text-[#b51d0d]">*</span>
+                  <label className="block text-xs font-semibold text-[#111111] mb-1.5 uppercase tracking-wider">
+                    Business Name <span className="text-[#0A0A0A]">*</span>
                   </label>
                   <input
                     type="text"
@@ -426,18 +439,18 @@ export function BusinessSetup() {
                     placeholder="e.g. Royal Bakery or Lumina Skincare"
                     value={formData.business_name}
                     onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
-                    className="w-full bg-white border border-[#e4beb7] rounded-xl px-4 py-3 text-sm text-[#1d1b19] placeholder:text-[#8f706a]/50 focus:outline-none focus:border-[#b51d0d] focus:ring-1 focus:ring-[#b51d0d] transition-all shadow-sm"
+                    className="w-full bg-white border border-[#DBDBD8] rounded-xl px-4 py-3 text-sm text-[#111111] placeholder:text-[#8A8A85]/50 focus:outline-none focus:border-[#0A0A0A] focus:ring-1 focus:ring-[#0A0A0A] transition-all shadow-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#1d1b19] mb-1.5 uppercase tracking-wider">
-                    Industry / Category <span className="text-[#b51d0d]">*</span>
+                  <label className="block text-xs font-semibold text-[#111111] mb-1.5 uppercase tracking-wider">
+                    Industry / Category <span className="text-[#0A0A0A]">*</span>
                   </label>
                   <select
                     value={formData.industry}
                     onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                    className="w-full bg-white border border-[#e4beb7] rounded-xl px-4 py-3 text-sm text-[#1d1b19] focus:outline-none focus:border-[#b51d0d] focus:ring-1 focus:ring-[#b51d0d] transition-all shadow-sm"
+                    className="w-full bg-white border border-[#DBDBD8] rounded-xl px-4 py-3 text-sm text-[#111111] focus:outline-none focus:border-[#0A0A0A] focus:ring-1 focus:ring-[#0A0A0A] transition-all shadow-sm"
                   >
                     <option value="">Select an Industry</option>
                     {industries.map((ind) => (
@@ -449,7 +462,7 @@ export function BusinessSetup() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#1d1b19] mb-1.5 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#111111] mb-1.5 uppercase tracking-wider">
                     Business Description (2–3 lines)
                   </label>
                   <textarea
@@ -457,7 +470,7 @@ export function BusinessSetup() {
                     placeholder="Describe what your business does, your mission, and unique selling points..."
                     value={formData.business_description}
                     onChange={(e) => setFormData({ ...formData, business_description: e.target.value })}
-                    className="w-full bg-white border border-[#e4beb7] rounded-xl px-4 py-3 text-sm text-[#1d1b19] placeholder:text-[#8f706a]/50 focus:outline-none focus:border-[#b51d0d] focus:ring-1 focus:ring-[#b51d0d] transition-all shadow-sm resize-none"
+                    className="w-full bg-white border border-[#DBDBD8] rounded-xl px-4 py-3 text-sm text-[#111111] placeholder:text-[#8A8A85]/50 focus:outline-none focus:border-[#0A0A0A] focus:ring-1 focus:ring-[#0A0A0A] transition-all shadow-sm resize-none"
                   />
                 </div>
               </div>
@@ -468,14 +481,14 @@ export function BusinessSetup() {
           {step === 2 && (
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-[#fef8f4] rounded-2xl flex items-center justify-center border border-[#e4beb7]/40 text-[#b51d0d]">
+                <div className="w-12 h-12 bg-[#F4F4F1] rounded-2xl flex items-center justify-center border border-[#DBDBD8]/40 text-[#0A0A0A]">
                   <Sparkles className="w-6 h-6" />
                 </div>
                 <div>
-                  <h1 className="font-headline text-2xl md:text-3xl font-bold text-[#1d1b19]">
+                  <h1 className="font-headline text-2xl md:text-3xl font-bold text-[#111111]">
                     Step 2 – Brand Identity
                   </h1>
-                  <p className="text-sm text-[#5b403c]">
+                  <p className="text-sm text-[#4A4A46]">
                     Define your brand voice, values, target audience, and key offerings.
                   </p>
                 </div>
@@ -484,8 +497,8 @@ export function BusinessSetup() {
               <div className="space-y-6 mt-6">
                 {/* Brand Voice Multi-select */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#1d1b19] mb-2 uppercase tracking-wider">
-                    Brand Voice (Multi-select) <span className="text-[#b51d0d]">*</span>
+                  <label className="block text-xs font-semibold text-[#111111] mb-2 uppercase tracking-wider">
+                    Brand Voice (Multi-select) <span className="text-[#0A0A0A]">*</span>
                   </label>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
                     {brandVoiceOptions.map((v) => {
@@ -497,15 +510,15 @@ export function BusinessSetup() {
                           onClick={() => toggleVoice(v.label)}
                           className={`p-3 rounded-xl border text-left transition-all ${
                             isSelected
-                              ? 'border-[#b51d0d] bg-[#b51d0d] text-white shadow-sm ring-1 ring-[#b51d0d]'
-                              : 'border-[#e4beb7] bg-white text-[#1d1b19] hover:bg-[#f8f3ef]'
+                              ? 'border-[#0A0A0A] bg-[#0A0A0A] text-white shadow-sm ring-1 ring-[#0A0A0A]'
+                              : 'border-[#DBDBD8] bg-white text-[#111111] hover:bg-[#F4F4F1]'
                           }`}
                         >
                           <div className="flex items-center justify-between">
                             <span className="font-semibold text-xs">{v.label}</span>
                             {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
                           </div>
-                          <span className={`text-[11px] block mt-0.5 ${isSelected ? 'text-white/80' : 'text-[#5b403c]'}`}>
+                          <span className={`text-[11px] block mt-0.5 ${isSelected ? 'text-white/80' : 'text-[#4A4A46]'}`}>
                             {v.desc}
                           </span>
                         </button>
@@ -517,10 +530,10 @@ export function BusinessSetup() {
                 {/* Brand Values Multi-select (Up to 5) */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-semibold text-[#1d1b19] uppercase tracking-wider">
+                    <label className="text-xs font-semibold text-[#111111] uppercase tracking-wider">
                       Brand Values (Select up to 5)
                     </label>
-                    <span className="text-xs text-[#8f706a]">
+                    <span className="text-xs text-[#8A8A85]">
                       {formData.brand_values.length} / 5 selected
                     </span>
                   </div>
@@ -534,11 +547,11 @@ export function BusinessSetup() {
                           onClick={() => toggleValue(val)}
                           className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-all flex items-center gap-1.5 ${
                             isSelected
-                              ? 'border-[#b51d0d] bg-[#ffdad4]/40 text-[#b51d0d] font-semibold border-[#b51d0d]'
-                              : 'border-[#e4beb7] bg-white text-[#5b403c] hover:bg-[#f8f3ef]'
+                              ? 'border-[#0A0A0A] bg-[#FDEAE5]/40 text-[#0A0A0A] font-semibold border-[#0A0A0A]'
+                              : 'border-[#DBDBD8] bg-white text-[#4A4A46] hover:bg-[#F4F4F1]'
                           }`}
                         >
-                          {isSelected && <Check className="w-3 h-3 text-[#b51d0d]" />}
+                          {isSelected && <Check className="w-3 h-3 text-[#0A0A0A]" />}
                           <span>{val}</span>
                         </button>
                       );
@@ -548,7 +561,7 @@ export function BusinessSetup() {
 
                 {/* Target Audience */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#1d1b19] mb-1.5 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#111111] mb-1.5 uppercase tracking-wider">
                     Target Audience
                   </label>
                   <textarea
@@ -556,13 +569,13 @@ export function BusinessSetup() {
                     placeholder="e.g. College students looking for affordable skincare."
                     value={formData.target_audience}
                     onChange={(e) => setFormData({ ...formData, target_audience: e.target.value })}
-                    className="w-full bg-white border border-[#e4beb7] rounded-xl px-4 py-3 text-sm text-[#1d1b19] placeholder:text-[#8f706a]/50 focus:outline-none focus:border-[#b51d0d] focus:ring-1 focus:ring-[#b51d0d] transition-all shadow-sm resize-none"
+                    className="w-full bg-white border border-[#DBDBD8] rounded-xl px-4 py-3 text-sm text-[#111111] placeholder:text-[#8A8A85]/50 focus:outline-none focus:border-[#0A0A0A] focus:ring-1 focus:ring-[#0A0A0A] transition-all shadow-sm resize-none"
                   />
                 </div>
 
                 {/* Products / Services */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#1d1b19] mb-1.5 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#111111] mb-1.5 uppercase tracking-wider">
                     Products / Services
                   </label>
                   <textarea
@@ -570,7 +583,7 @@ export function BusinessSetup() {
                     placeholder="e.g. We provide handcrafted scented candles made from soy wax."
                     value={formData.products_services}
                     onChange={(e) => setFormData({ ...formData, products_services: e.target.value })}
-                    className="w-full bg-white border border-[#e4beb7] rounded-xl px-4 py-3 text-sm text-[#1d1b19] placeholder:text-[#8f706a]/50 focus:outline-none focus:border-[#b51d0d] focus:ring-1 focus:ring-[#b51d0d] transition-all shadow-sm resize-none"
+                    className="w-full bg-white border border-[#DBDBD8] rounded-xl px-4 py-3 text-sm text-[#111111] placeholder:text-[#8A8A85]/50 focus:outline-none focus:border-[#0A0A0A] focus:ring-1 focus:ring-[#0A0A0A] transition-all shadow-sm resize-none"
                   />
                 </div>
               </div>
@@ -581,14 +594,14 @@ export function BusinessSetup() {
           {step === 3 && (
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-[#fef8f4] rounded-2xl flex items-center justify-center border border-[#e4beb7]/40 text-[#b51d0d]">
+                <div className="w-12 h-12 bg-[#F4F4F1] rounded-2xl flex items-center justify-center border border-[#DBDBD8]/40 text-[#0A0A0A]">
                   <UploadCloud className="w-6 h-6" />
                 </div>
                 <div>
-                  <h1 className="font-headline text-2xl md:text-3xl font-bold text-[#1d1b19]">
+                  <h1 className="font-headline text-2xl md:text-3xl font-bold text-[#111111]">
                     Step 3 – Brand Assets
                   </h1>
-                  <p className="text-sm text-[#5b403c]">
+                  <p className="text-sm text-[#4A4A46]">
                     Upload your logo and product imagery for visual AI consistency.
                   </p>
                 </div>
@@ -597,7 +610,7 @@ export function BusinessSetup() {
               <div className="space-y-6 mt-6">
                 {/* Brand Logo Upload */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#1d1b19] mb-2 uppercase tracking-wider">
+                  <label className="block text-xs font-semibold text-[#111111] mb-2 uppercase tracking-wider">
                     Brand Logo (Single Image)
                   </label>
 
@@ -614,7 +627,7 @@ export function BusinessSetup() {
                   />
 
                   {formData.logo_url ? (
-                    <div className="relative w-32 h-32 rounded-2xl border border-[#e4beb7] overflow-hidden bg-gray-50 flex items-center justify-center p-2 shadow-sm group">
+                    <div className="relative w-32 h-32 rounded-2xl border border-[#DBDBD8] overflow-hidden bg-gray-50 flex items-center justify-center p-2 shadow-sm group">
                       <img src={formData.logo_url} alt="Logo" className="max-w-full max-h-full object-contain" />
                       <button
                         type="button"
@@ -632,19 +645,19 @@ export function BusinessSetup() {
                       onDrop={handleLogoDrop}
                       className={`w-full border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all group ${
                         isDraggingLogo
-                          ? 'border-[#b51d0d] bg-[#ffdad4]/40 scale-[1.01]'
-                          : 'border-[#e4beb7] hover:border-[#b51d0d] bg-[#fef8f4]/50'
+                          ? 'border-[#0A0A0A] bg-[#FDEAE5]/40 scale-[1.01]'
+                          : 'border-[#DBDBD8] hover:border-[#0A0A0A] bg-[#F4F4F1]/50'
                       }`}
                     >
                       {isUploadingLogo ? (
-                        <Loader2 className="w-8 h-8 text-[#b51d0d] animate-spin" />
+                        <Loader2 className="w-8 h-8 text-[#0A0A0A] animate-spin" />
                       ) : (
                         <>
-                          <UploadCloud className="w-8 h-8 text-[#8f706a] group-hover:text-[#b51d0d] transition-colors mb-2" />
-                          <span className="text-xs font-semibold text-[#1d1b19]">
+                          <UploadCloud className="w-8 h-8 text-[#8A8A85] group-hover:text-[#0A0A0A] transition-colors mb-2" />
+                          <span className="text-xs font-semibold text-[#111111]">
                             {isDraggingLogo ? 'Drop Logo File Here' : 'Click or Drag to Upload Logo'}
                           </span>
-                          <span className="text-[11px] text-[#8f706a]">PNG, JPEG, WebP, SVG</span>
+                          <span className="text-[11px] text-[#8A8A85]">PNG, JPEG, WebP, SVG</span>
                         </>
                       )}
                     </div>
@@ -654,10 +667,10 @@ export function BusinessSetup() {
                 {/* Product / Service Images */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="text-xs font-semibold text-[#1d1b19] uppercase tracking-wider">
+                    <label className="text-xs font-semibold text-[#111111] uppercase tracking-wider">
                       Product / Service Images (3–5 recommended)
                     </label>
-                    <span className="text-xs text-[#8f706a]">
+                    <span className="text-xs text-[#8A8A85]">
                       {formData.brand_images.length} uploaded
                     </span>
                   </div>
@@ -679,7 +692,7 @@ export function BusinessSetup() {
                     {formData.brand_images.map((imgUrl, idx) => (
                       <div
                         key={idx}
-                        className="relative aspect-square rounded-xl border border-[#e4beb7] overflow-hidden bg-gray-50 flex items-center justify-center group shadow-sm"
+                        className="relative aspect-square rounded-xl border border-[#DBDBD8] overflow-hidden bg-gray-50 flex items-center justify-center group shadow-sm"
                       >
                         <img src={imgUrl} alt={`Product ${idx}`} className="w-full h-full object-cover" />
                         <button
@@ -699,16 +712,16 @@ export function BusinessSetup() {
                       onDrop={handleProductDrop}
                       className={`aspect-square border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all group ${
                         isDraggingImages
-                          ? 'border-[#b51d0d] bg-[#ffdad4]/40 scale-[1.02]'
-                          : 'border-[#e4beb7] hover:border-[#b51d0d] bg-[#fef8f4]/50'
+                          ? 'border-[#0A0A0A] bg-[#FDEAE5]/40 scale-[1.02]'
+                          : 'border-[#DBDBD8] hover:border-[#0A0A0A] bg-[#F4F4F1]/50'
                       }`}
                     >
                       {isUploadingImages ? (
-                        <Loader2 className="w-5 h-5 text-[#b51d0d] animate-spin" />
+                        <Loader2 className="w-5 h-5 text-[#0A0A0A] animate-spin" />
                       ) : (
                         <>
-                          <ImageIcon className="w-5 h-5 text-[#8f706a] group-hover:text-[#b51d0d] mb-1" />
-                          <span className="text-[10px] font-semibold text-[#1d1b19]">
+                          <ImageIcon className="w-5 h-5 text-[#8A8A85] group-hover:text-[#0A0A0A] mb-1" />
+                          <span className="text-[10px] font-semibold text-[#111111]">
                             {isDraggingImages ? 'Drop Images' : 'Add Image'}
                           </span>
                         </>
@@ -724,14 +737,14 @@ export function BusinessSetup() {
           {step === 4 && (
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-[#fef8f4] rounded-2xl flex items-center justify-center border border-[#e4beb7]/40 text-[#b51d0d]">
+                <div className="w-12 h-12 bg-[#F4F4F1] rounded-2xl flex items-center justify-center border border-[#DBDBD8]/40 text-[#0A0A0A]">
                   <Brain className="w-6 h-6" />
                 </div>
                 <div>
-                  <h1 className="font-headline text-2xl md:text-3xl font-bold text-[#1d1b19]">
+                  <h1 className="font-headline text-2xl md:text-3xl font-bold text-[#111111]">
                     Step 4 – Persistent AI Instructions
                   </h1>
-                  <p className="text-sm text-[#5b403c]">
+                  <p className="text-sm text-[#4A4A46]">
                     Set permanent guardrails and preferences for every piece of generated content.
                   </p>
                 </div>
@@ -739,26 +752,26 @@ export function BusinessSetup() {
 
               <div className="space-y-6 mt-6">
                 <div>
-                  <label className="block text-xs font-semibold text-[#1d1b19] mb-1.5 uppercase tracking-wider flex items-center gap-1.5">
+                  <label className="block text-xs font-semibold text-[#111111] mb-1.5 uppercase tracking-wider flex items-center gap-1.5">
                     <span>Anything the AI should always remember while creating content?</span>
-                    <HelpCircle className="w-3.5 h-3.5 text-[#8f706a]" />
+                    <HelpCircle className="w-3.5 h-3.5 text-[#8A8A85]" />
                   </label>
                   <textarea
                     rows={4}
                     placeholder="Never sound too salesy. Mention eco-friendly packaging whenever relevant. Keep captions short."
                     value={formData.ai_instructions}
                     onChange={(e) => setFormData({ ...formData, ai_instructions: e.target.value })}
-                    className="w-full bg-white border border-[#e4beb7] rounded-xl px-4 py-3 text-sm text-[#1d1b19] placeholder:text-[#8f706a]/50 focus:outline-none focus:border-[#b51d0d] focus:ring-1 focus:ring-[#b51d0d] transition-all shadow-sm resize-none"
+                    className="w-full bg-white border border-[#DBDBD8] rounded-xl px-4 py-3 text-sm text-[#111111] placeholder:text-[#8A8A85]/50 focus:outline-none focus:border-[#0A0A0A] focus:ring-1 focus:ring-[#0A0A0A] transition-all shadow-sm resize-none"
                   />
                 </div>
 
                 {/* Summary Preview Box */}
-                <div className="bg-[#fef8f4] border border-[#e4beb7]/60 rounded-2xl p-4 text-xs space-y-2">
-                  <div className="font-semibold text-[#1d1b19] uppercase tracking-wider flex items-center gap-1 text-[11px]">
-                    <Sparkles className="w-3.5 h-3.5 text-[#b51d0d]" />
+                <div className="bg-[#F4F4F1] border border-[#DBDBD8]/60 rounded-2xl p-4 text-xs space-y-2">
+                  <div className="font-semibold text-[#111111] uppercase tracking-wider flex items-center gap-1 text-[11px]">
+                    <Sparkles className="w-3.5 h-3.5 text-[#0A0A0A]" />
                     <span>Brand Memory Brief Summary</span>
                   </div>
-                  <div className="text-[#5b403c] space-y-1">
+                  <div className="text-[#4A4A46] space-y-1">
                     <p>
                       <strong>Business:</strong> {formData.business_name || 'N/A'} ({formData.industry || 'General'})
                     </p>
@@ -782,12 +795,12 @@ export function BusinessSetup() {
           )}
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between mt-8 pt-6 border-t border-[#ece7e3]">
+          <div className="flex items-center justify-between mt-8 pt-6 border-t border-[#DBDBD8]">
             {step > 1 ? (
               <button
                 type="button"
                 onClick={handleBack}
-                className="px-6 py-3 rounded-xl font-medium text-xs text-[#5b403c] hover:bg-[#f8f3ef] transition-colors"
+                className="px-6 py-3 rounded-xl font-medium text-xs text-[#4A4A46] hover:bg-[#F4F4F1] transition-colors"
               >
                 Previous
               </button>
@@ -799,7 +812,7 @@ export function BusinessSetup() {
               type="button"
               onClick={handleNext}
               disabled={isSubmitting || !canContinue()}
-              className="bg-[#b51d0d] hover:bg-[#d83824] active:scale-[0.98] text-white px-8 py-3 rounded-xl font-semibold text-sm transition-all shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ml-auto"
+              className="bg-[#0A0A0A] hover:bg-[#262626] active:scale-[0.98] text-white px-8 py-3 rounded-xl font-semibold text-sm transition-all shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ml-auto"
             >
               {isSubmitting ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

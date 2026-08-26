@@ -138,6 +138,9 @@ AUDIT CRITERIA — check EVERY draft against ALL of these
    • Twitter/X — must be ≤ 280 chars (count every character including spaces).
                  Reject immediately if this limit is exceeded.
    • Instagram — must include ≥ 5 hashtags and a CTA in the final line.
+   • Facebook  — engaging story, friendly tone, include 2-3 hashtags and CTA.
+   • WhatsApp  — clean bullet points/formatting, emojis, punchy broadcast copy.
+   • Email     — must include Subject Line, Preheader, structured Body, and CTA.
 
 4. BRAND SAFETY
    Reject any draft that contains:

@@ -1,218 +1,97 @@
 import { motion } from 'motion/react';
-import { Sparkles, Calendar, TrendingUp } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { Link } from 'react-router';
+import { useMemo } from 'react';
+import { FESTIVALS, getDaysUntil, formatFestivalDate } from '@/lib/festivals';
+
+// Rotating black / yellow / white treatment for the festival grid — matches
+// the bold system's "no per-item rainbow colors" rule (see Dashboard's
+// Quick Actions and the "Meet the Pipeline" agent cards on the landing page).
+const THEME_CYCLE = [
+  { card: 'bg-[#0A0A0A] text-white', letter: 'text-white/90', badge: 'bg-white/15 text-white' },
+  { card: 'bg-[#E4FF3D] text-[#0A0A0A]', letter: 'text-[#0A0A0A]/80', badge: 'bg-[#0A0A0A]/10 text-[#0A0A0A]' },
+  { card: 'bg-white text-[#0A0A0A] border border-[#DBDBD8]', letter: 'text-[#0A0A0A]/[0.06]', badge: 'bg-[#F4F4F1] text-[#0A0A0A]' },
+];
 
 export function FestivalIdeas() {
-  const festivals = [
-    {
-      name: 'Holi',
-      date: 'March 14, 2026',
-      daysLeft: 27,
-      emoji: '🎨',
-      color: 'from-pink-400 to-purple-400',
-      ideas: [
-        'Colorful product showcase',
-        'Festival discount offers',
-        'Customer celebration stories'
-      ]
-    },
-    {
-      name: 'Eid',
-      date: 'March 31, 2026',
-      daysLeft: 44,
-      emoji: '🌙',
-      color: 'from-emerald-400 to-teal-400',
-      ideas: [
-        'Special Eid greetings',
-        'Gift collection promotion',
-        'Community celebration posts'
-      ]
-    },
-    {
-      name: 'Ram Navami',
-      date: 'April 6, 2026',
-      daysLeft: 50,
-      emoji: '🪔',
-      color: 'from-orange-400 to-red-400',
-      ideas: [
-        'Traditional blessings',
-        'Festival special offers',
-        'Cultural content'
-      ]
-    },
-    {
-      name: 'Mahavir Jayanti',
-      date: 'April 8, 2026',
-      daysLeft: 52,
-      emoji: '🙏',
-      color: 'from-yellow-400 to-orange-400',
-      ideas: [
-        'Peace & harmony message',
-        'Spiritual content',
-        'Community greetings'
-      ]
-    },
-    {
-      name: 'Baisakhi',
-      date: 'April 14, 2026',
-      daysLeft: 58,
-      emoji: '🌾',
-      color: 'from-green-400 to-yellow-400',
-      ideas: [
-        'Harvest celebration',
-        'Punjabi culture showcase',
-        'Festival greetings'
-      ]
-    },
-    {
-      name: 'Raksha Bandhan',
-      date: 'August 9, 2026',
-      daysLeft: 175,
-      emoji: '🎀',
-      color: 'from-rose-400 to-pink-400',
-      ideas: [
-        'Sibling love stories',
-        'Gift ideas promotion',
-        'Family bonding content'
-      ]
-    },
-    {
-      name: 'Independence Day',
-      date: 'August 15, 2026',
-      daysLeft: 181,
-      emoji: '🇮🇳',
-      color: 'from-orange-500 via-white to-green-500',
-      ideas: [
-        'Patriotic content',
-        'Made in India showcase',
-        'National pride posts'
-      ]
-    },
-    {
-      name: 'Ganesh Chaturthi',
-      date: 'August 22, 2026',
-      daysLeft: 188,
-      emoji: '🐘',
-      color: 'from-amber-400 to-orange-400',
-      ideas: [
-        'Festival blessings',
-        'Cultural celebrations',
-        'Special offers'
-      ]
-    },
-    {
-      name: 'Navratri',
-      date: 'October 3, 2026',
-      daysLeft: 230,
-      emoji: '💃',
-      color: 'from-purple-400 to-pink-400',
-      ideas: [
-        'Dandiya nights promotion',
-        'Traditional wear showcase',
-        '9 days content series'
-      ]
-    },
-    {
-      name: 'Dussehra',
-      date: 'October 12, 2026',
-      daysLeft: 239,
-      emoji: '🏹',
-      color: 'from-red-500 to-orange-500',
-      ideas: [
-        'Victory celebrations',
-        'Good over evil theme',
-        'Festival discounts'
-      ]
-    },
-    {
-      name: 'Diwali',
-      date: 'November 1, 2026',
-      daysLeft: 259,
-      emoji: '🪔',
-      color: 'from-yellow-500 via-orange-500 to-red-500',
-      ideas: [
-        'Festival lighting showcase',
-        'Gift hampers promotion',
-        'Prosperity wishes'
-      ]
-    },
-    {
-      name: 'Christmas',
-      date: 'December 25, 2026',
-      daysLeft: 313,
-      emoji: '🎄',
-      color: 'from-red-500 to-green-500',
-      ideas: [
-        'Holiday greetings',
-        'Gift collection',
-        'Year-end celebrations'
-      ]
-    }
-  ];
+  // WHAT: FESTIVALS (src/lib/festivals.ts) stores each festival's raw date
+  // and ideas — shared with the Weekly Planner's auto-suggest feature.
+  // `daysLeft` and the display date are computed live here (annually
+  // recurring, via getDaysUntil/formatFestivalDate) instead of being
+  // hardcoded numbers that went stale the moment a day passed. Sorted so
+  // the soonest-upcoming festival is always first — that's what the
+  // "Featured Festival" card below assumes (`festivals[0]`).
+  const festivals = useMemo(
+    () =>
+      FESTIVALS.map((f) => ({
+        ...f,
+        daysLeft: getDaysUntil(f.date),
+        date: formatFestivalDate(f.date),
+      })).sort((a, b) => a.daysLeft - b.daysLeft),
+    [],
+  );
 
   const getStatusBadge = (daysLeft: number) => {
-    if (daysLeft <= 7) return { text: 'This Week!', color: 'bg-red-100 text-red-700 border-red-300' };
-    if (daysLeft <= 30) return { text: 'Coming Soon', color: 'bg-orange-100 text-orange-700 border-orange-300' };
-    if (daysLeft <= 60) return { text: 'Plan Ahead', color: 'bg-blue-100 text-blue-700 border-blue-300' };
-    return { text: 'Future', color: 'bg-gray-100 text-gray-700 border-gray-300' };
+    if (daysLeft <= 7) return 'This Week!';
+    if (daysLeft <= 30) return 'Coming Soon';
+    if (daysLeft <= 60) return 'Plan Ahead';
+    return 'Future';
   };
 
+  const featured = festivals[0];
+
   return (
-    <div className="max-w-7xl mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+    <div className="max-w-7xl mx-auto font-body">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#0F172A] mb-2">Festival Ideas</h1>
-          <p className="text-[#64748B]">Never miss an opportunity to connect with your audience during festivals</p>
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#8A8A85] mb-3">
+            <span className="text-[#111111]">04 —</span> Festival Ideas
+          </div>
+          <h1 className="font-headline text-3xl sm:text-4xl font-extrabold text-[#111111] tracking-tight">
+            Never miss the <span className="text-[#0A0A0A] bg-[#E4FF3D] px-1">moment.</span>
+          </h1>
         </div>
 
-        {/* Featured Festival */}
+        {/* Featured Festival — black hero card */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="mb-8"
+          transition={{ duration: 0.5, delay: 0.15 }}
+          className="mb-10"
         >
-          <div className={`bg-gradient-to-br ${festivals[0].color} rounded-3xl p-8 md:p-12 text-white shadow-2xl relative overflow-hidden`}>
-            <div className="absolute top-0 right-0 text-[200px] opacity-10 leading-none">
-              {festivals[0].emoji}
-            </div>
+          <div className="bg-[#0A0A0A] text-white rounded-md p-8 md:p-12 relative overflow-hidden">
+            <span className="absolute -right-4 top-1/2 -translate-y-1/2 text-[220px] leading-none opacity-10 select-none">
+              {featured.emoji}
+            </span>
             <div className="relative z-10">
-              <div className="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
-                <span className="text-sm font-medium">🎉 Next Festival</span>
+              <span className="inline-block bg-[#E4FF3D] text-[#0A0A0A] text-xs font-bold uppercase tracking-wide px-3 py-1.5 rounded-full mb-5">
+                Next Festival
+              </span>
+              <h2 className="font-headline text-4xl md:text-5xl font-black mb-3">{featured.name}</h2>
+              <div className="text-sm text-white/70 mb-6">
+                {featured.date} · {featured.daysLeft} days to go
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">{festivals[0].name}</h2>
-              <div className="flex flex-wrap items-center gap-4 mb-6">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
-                  <span className="text-lg">{festivals[0].date}</span>
-                </div>
-                <div className="bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full">
-                  <span className="text-sm font-medium">{festivals[0].daysLeft} days to go</span>
-                </div>
-              </div>
-              <div className="grid md:grid-cols-3 gap-4 mb-8">
-                {festivals[0].ideas.map((idea, index) => (
-                  <div key={index} className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Sparkles className="w-4 h-4" />
-                      <span>{idea}</span>
-                    </div>
-                  </div>
+
+              <div className="flex flex-wrap gap-2 mb-8">
+                {featured.ideas.map((idea) => (
+                  <span
+                    key={idea}
+                    className="text-xs bg-white/10 border border-white/15 rounded-full px-3.5 py-1.5"
+                  >
+                    {idea}
+                  </span>
                 ))}
               </div>
+
               <Link to="/app/generate">
                 <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-white text-[#2EC4B6] px-8 py-4 rounded-2xl font-medium hover:shadow-xl transition-all flex items-center gap-2"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="bg-[#E4FF3D] hover:bg-[#C9E200] text-[#0A0A0A] px-7 py-3.5 rounded-full font-semibold text-sm transition-colors inline-flex items-center gap-2"
                 >
-                  <Sparkles className="w-5 h-5" />
-                  Generate {festivals[0].name} Content
+                  Generate {featured.name} Content
+                  <span>→</span>
                 </motion.button>
               </Link>
             </div>
@@ -220,58 +99,54 @@ export function FestivalIdeas() {
         </motion.div>
 
         {/* All Festivals Grid */}
-        <div>
-          <h2 className="text-2xl font-bold text-[#0F172A] mb-6">All Festivals</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="mb-10">
+          <h2 className="font-headline text-xl font-extrabold text-[#111111] mb-5">All Festivals</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {festivals.map((festival, index) => {
+              const theme = THEME_CYCLE[index % THEME_CYCLE.length];
               const status = getStatusBadge(festival.daysLeft);
               return (
                 <motion.div
-                  key={index}
+                  key={festival.name}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.05 }}
-                  whileHover={{ scale: 1.02 }}
-                  className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer group"
+                  transition={{ duration: 0.4, delay: index * 0.04 }}
+                  whileHover={{ y: -4 }}
+                  className={`rounded-md overflow-hidden relative ${theme.card}`}
                 >
-                  {/* Festival Header */}
-                  <div className={`bg-gradient-to-br ${festival.color} p-6 text-white relative overflow-hidden`}>
-                    <div className="absolute top-0 right-0 text-8xl opacity-20 leading-none">
-                      {festival.emoji}
+                  <div className="p-5 relative min-h-[150px] flex flex-col justify-between">
+                    <span
+                      className={`absolute -top-3 right-1 font-headline font-black text-[100px] leading-none pointer-events-none ${theme.letter}`}
+                    >
+                      {festival.name[0]}
+                    </span>
+                    <div className="relative z-10 flex items-center justify-between">
+                      <span className={`text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full ${theme.badge}`}>
+                        {status}
+                      </span>
                     </div>
                     <div className="relative z-10">
-                      <div className={`inline-block ${status.color} border-2 px-3 py-1 rounded-full mb-3`}>
-                        <span className="text-xs font-medium">{status.text}</span>
+                      <h3 className="font-headline text-xl font-extrabold mb-1">{festival.name}</h3>
+                      <div className="text-xs opacity-70">
+                        {festival.date} · {festival.daysLeft} days left
                       </div>
-                      <h3 className="text-2xl font-bold mb-2">{festival.name}</h3>
-                      <div className="text-sm opacity-90 mb-1">{festival.date}</div>
-                      <div className="text-sm font-medium">{festival.daysLeft} days left</div>
                     </div>
                   </div>
 
-                  {/* Festival Ideas */}
-                  <div className="p-6">
-                    <h4 className="text-sm font-bold text-[#0F172A] mb-3 flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-[#2EC4B6]" />
-                      Campaign Ideas
-                    </h4>
-                    <ul className="space-y-2 mb-6">
-                      {festival.ideas.map((idea, ideaIndex) => (
-                        <li key={ideaIndex} className="text-sm text-[#64748B] flex items-start gap-2">
-                          <span className="text-[#2EC4B6] mt-1">•</span>
+                  <div className="bg-white p-5 border-t border-[#DBDBD8]/60">
+                    <ul className="space-y-1.5 mb-4">
+                      {festival.ideas.slice(0, 3).map((idea) => (
+                        <li key={idea} className="text-xs text-[#4A4A46] flex items-start gap-2">
+                          <span className="text-[#0A0A0A] mt-0.5">·</span>
                           <span>{idea}</span>
                         </li>
                       ))}
                     </ul>
                     <Link to="/app/generate">
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="w-full bg-[#2EC4B6] text-white py-3 rounded-xl hover:bg-[#26a99d] transition-all flex items-center justify-center gap-2 group-hover:shadow-lg"
-                      >
-                        <Sparkles className="w-4 h-4" />
+                      <button className="w-full bg-[#0A0A0A] hover:bg-[#262626] text-white text-xs font-semibold py-2.5 rounded-full transition-colors inline-flex items-center justify-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5" />
                         Generate Content
-                      </motion.button>
+                      </button>
                     </Link>
                   </div>
                 </motion.div>
@@ -280,39 +155,29 @@ export function FestivalIdeas() {
           </div>
         </div>
 
-        {/* Pro Tip */}
+        {/* Marketing Tips */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
-          className="mt-8 bg-gradient-to-br from-[#EEF2FF] to-[#F0F9FF] rounded-3xl p-8 border-2 border-[#E5E7EB]"
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="bg-white border border-[#DBDBD8] rounded-md p-7"
         >
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-[#FF9F1C] rounded-2xl flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl">💡</span>
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-[#0F172A] mb-2">Festival Marketing Tips</h3>
-              <ul className="space-y-2 text-[#64748B]">
-                <li className="flex items-start gap-2">
-                  <span className="text-[#2EC4B6] mt-1">✓</span>
-                  <span>Start planning your content at least 2 weeks before the festival</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#2EC4B6] mt-1">✓</span>
-                  <span>Create a content series leading up to the festival for maximum engagement</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#2EC4B6] mt-1">✓</span>
-                  <span>Use local languages and cultural references to connect better with your audience</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[#2EC4B6] mt-1">✓</span>
-                  <span>Combine festival greetings with special offers for better conversions</span>
-                </li>
-              </ul>
-            </div>
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#8A8A85] mb-4">
+            <span className="text-[#111111]">TIP —</span> Festival Marketing
           </div>
+          <ul className="space-y-2.5">
+            {[
+              'Start planning your content at least 2 weeks before the festival.',
+              'Create a content series leading up to the festival for maximum engagement.',
+              'Use local languages and cultural references to connect better with your audience.',
+              'Combine festival greetings with special offers for better conversions.',
+            ].map((tip) => (
+              <li key={tip} className="text-sm text-[#4A4A46] flex items-start gap-2.5">
+                <span className="text-[#C9E200] font-bold mt-0.5">✓</span>
+                <span>{tip}</span>
+              </li>
+            ))}
+          </ul>
         </motion.div>
       </motion.div>
     </div>
